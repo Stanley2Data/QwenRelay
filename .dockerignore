@@ -20,3 +20,11 @@ marlin-tune/cuda13-home
 # the README film and its renderer's npm tree are not needed at runtime
 docs/media
 bench/demo/node_modules
+
+.venv
+.build
+.cache
+tests
+*.verification.json
+# The runtime overlay contains vllm/model_executor/models source modules.
+!extensions/**

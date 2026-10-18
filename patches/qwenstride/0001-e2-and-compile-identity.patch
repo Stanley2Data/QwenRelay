@@ -1,0 +1,257 @@
+--- a/vllm/envs.py
++++ b/vllm/envs.py
+@@ -2583,3 +2583,14 @@
+         factors[var] = normalize_value(os.getenv(var))
+ 
+     return factors
++
++
++# Core extension switches participate in the native 0.31 compile identity.
++# Keep raw strings: whitespace semantics differ across legacy readers.
++environment_variables['VLLM_INT8_KV_PAD16'] = lambda: os.environ.get('VLLM_INT8_KV_PAD16', "0")
++environment_variables['VLLM_KV_PROMOTE_ALIGN_PRIMARY'] = lambda: os.environ.get('VLLM_KV_PROMOTE_ALIGN_PRIMARY', "0")
++environment_variables['QWEN_PF2'] = lambda: os.environ.get('QWEN_PF2', "0")
++environment_variables['QWEN_O2'] = lambda: os.environ.get('QWEN_O2', "0")
++environment_variables['QWEN_O4'] = lambda: os.environ.get('QWEN_O4', "0")
++environment_variables['QWEN_O5'] = lambda: os.environ.get('QWEN_O5', "0")
++environment_variables['VLLM_INT8_TARGET_TAIL_PAD'] = lambda: os.environ.get('VLLM_INT8_TARGET_TAIL_PAD', "0")
+--- /dev/null
++++ b/vllm/v1/attention/backends/int8_kv_layout.py
+@@ -0,0 +1,121 @@
++"""INT8 per-token-head physical layout: C/D0/E0 share one plumbing.
++
++logical_hs = 256
++scale_bytes = 4
++tail_pad_bytes in {0, 4, 12}
++physical_hs = logical_hs + scale_bytes + tail_pad_bytes
++
++C   pad=0  -> 260B + int32 reader
++D0  pad=4  -> 264B + int32 reader
++E0  pad=12 -> 272B + native tl.load  (VLLM_INT8_KV_PAD16=1)
++
++Scale always at +logical_hs (256). Padding is never scale.
++Draft head_size=128 stays 132B (no tail pad).
++Default OFF: PAD16 unset, tail pad 0.
++"""
++from __future__ import annotations
++
++import os
++
++INT8_SCALE_BYTES = 4
++TARGET_FA_HEAD_SIZE = 256
++DRAFT_HEAD_SIZE = 128
++TAIL_PAD_ALLOWED = (0, 4, 12)
++
++
++def _env_flag(name: str) -> bool:
++    return os.environ.get(name, "").strip() == "1"
++
++
++def pad16_enabled() -> bool:
++    return _env_flag("VLLM_INT8_KV_PAD16")
++
++
++def target_tail_pad_bytes() -> int:
++    if pad16_enabled():
++        return 12
++    raw = os.environ.get("VLLM_INT8_TARGET_TAIL_PAD", "0").strip()
++    try:
++        n = int(raw)
++    except ValueError:
++        n = 0
++    return n if n in TAIL_PAD_ALLOWED else 0
++
++
++def load_i32_enabled() -> bool:
++    if pad16_enabled():
++        return False
++    return _env_flag("VLLM_SPEC_ATTN_I32_LOAD")
++
++
++def load_i64_enabled() -> bool:
++    if pad16_enabled():
++        return False
++    return _env_flag("VLLM_SPEC_ATTN_I64_LOAD")
++
++
++def int8_head_phys_bytes(head_size: int, *, tail_pad: int | None = None) -> int:
++    pad = target_tail_pad_bytes() if tail_pad is None else tail_pad
++    if head_size != TARGET_FA_HEAD_SIZE:
++        pad = 0
++    if pad not in TAIL_PAD_ALLOWED:
++        pad = 0
++    return head_size + INT8_SCALE_BYTES + pad
++
++
++def int8_scale_byte_offset(head_size: int) -> int:
++    return head_size
++
++
++def expected_half_elements(head_size: int, dtype_sz: int, *, tail_pad: int | None = None) -> int:
++    phys = int8_head_phys_bytes(head_size, tail_pad=tail_pad)
++    if phys % dtype_sz != 0:
++        raise ValueError(f"physical head {phys} not divisible by dtype {dtype_sz}")
++    return phys // dtype_sz
++
++
++def carve_int8_scale_views(kv_cache, head_size: int, *, tail_pad: int | None = None):
++    """Strided FP32 views at +head_size, never padded_hs-4."""
++    import torch
++
++    num_blocks, nkv, block_size, content = kv_cache.shape
++    dtype_sz = kv_cache.element_size()
++    if dtype_sz != 1:
++        raise ValueError("INT8 scale layout requires one-byte storage")
++    padded_hs = content // 2
++    expected = expected_half_elements(head_size, dtype_sz, tail_pad=tail_pad)
++    if padded_hs != expected:
++        raise ValueError(
++            f"INT8 KV half width {padded_hs} != expected {expected} "
++            f"(head_size={head_size}, dtype_sz={dtype_sz})"
++        )
++    hs_elems = head_size
++    raw = kv_cache.untyped_storage()
++    base_f32 = torch.tensor([], dtype=torch.float32, device=kv_cache.device).set_(raw)
++
++    def to_f32_units(elements: int) -> int:
++        nbytes = elements * dtype_sz
++        if nbytes % 4 != 0:
++            raise ValueError("scale view requires 4-byte alignment")
++        return nbytes // 4
++
++    strides = kv_cache.stride()
++    block_f32 = to_f32_units(strides[0])
++    head_f32 = to_f32_units(strides[1])
++    slot_f32 = to_f32_units(strides[2])
++    base_off_f32 = to_f32_units(kv_cache.storage_offset())
++    k_scale_off_f32 = base_off_f32 + to_f32_units(hs_elems)
++    v_scale_off_f32 = base_off_f32 + to_f32_units(padded_hs + hs_elems)
++    k_scale = torch.as_strided(
++        base_f32,
++        size=(num_blocks, block_size, nkv),
++        stride=(block_f32, slot_f32, head_f32),
++        storage_offset=k_scale_off_f32,
++    )
++    v_scale = torch.as_strided(
++        base_f32,
++        size=(num_blocks, block_size, nkv),
++        stride=(block_f32, slot_f32, head_f32),
++        storage_offset=v_scale_off_f32,
++    )
++    return k_scale, v_scale
+--- a/vllm/v1/attention/backends/triton_attn.py
++++ b/vllm/v1/attention/backends/triton_attn.py
+@@ -456,12 +456,21 @@
+         pass
+ 
+ 
++from vllm.v1.attention.backends.int8_kv_layout import (
++    int8_head_phys_bytes, carve_int8_scale_views,
++)
++
++
+ class TritonAttentionBackend(AttentionBackend):
+     @classmethod
+     def customize_spec(cls, spec: "AttentionSpec") -> "AttentionSpec":
+         """Per-token-head modes pack inline fp32 scales after each head's
+         data, so the content is (data + one scale) per K/V side."""
+         mode = spec.kv_quant_mode
++        if mode == KVQuantMode.INT8_PER_TOKEN_HEAD:
++            expected = int8_head_phys_bytes(spec.head_size) + int8_head_phys_bytes(spec.head_size_v)
++            if spec.state_content_bytes is not None and spec.state_content_bytes != expected:
++                raise ValueError("E2 INT8 content metadata disagrees with the startup layout")
+         if spec.state_content_bytes is not None or not mode.is_per_token_head:
+             return spec
+         hs_k, hs_v = spec.head_size, spec.head_size_v
+@@ -469,6 +478,8 @@
+             hs_k, hs_v = hs_k // 2, hs_v // 2
+         scale_bytes = get_dtype_size(torch.float32)
+         content = (hs_k + hs_v) * get_dtype_size(spec.dtype) + 2 * scale_bytes
++        if mode == KVQuantMode.INT8_PER_TOKEN_HEAD:
++            content = int8_head_phys_bytes(hs_k) + int8_head_phys_bytes(hs_v)
+         return replace(spec, state_content_bytes=content)
+ 
+     supported_dtypes: ClassVar[list[torch.dtype]] = [
+@@ -583,6 +594,13 @@
+         Scale shape: ``(num_blocks, block_size, num_kv_heads)``
+         """
+         if self._k_scale_cache is not None:
++            return
++        if self._kv_quant_mode == KVQuantMode.INT8_PER_TOKEN_HEAD:
++            self._k_scale_cache, self._v_scale_cache = carve_int8_scale_views(
++                kv_cache, self.head_size
++            )
++            self._k_scale_cache.fill_(1.0)
++            self._v_scale_cache.fill_(1.0)
+             return
+         from vllm.utils.torch_utils import get_dtype_size
+ 
+--- a/vllm/v1/core/kv_cache_utils.py
++++ b/vllm/v1/core/kv_cache_utils.py
+@@ -1378,6 +1378,53 @@
+         tail_names,
+         tail_page,
+     )
++def _align_candidate_to_primary_block(
++    spec: AttentionSpec,
++    primary_block: int,
++    max_page_size: int,
++    covering_block: int,
++    name: str,
++) -> KVCacheSpec | None:
++    """E2 fallback: raise draft block to the primary, then page-pad.
++
++    The original promote path requires a covering block that already exceeds
++    max_page_size and divides the primary block. When the covering block is
++    larger than the primary (E0 272B: covering 832 vs primary 800), that
++    search is empty and the engine keeps draft block=16, padding each
++    16-token page to the full target page (about 2 percent useful bytes).
++
++    If VLLM_KV_PROMOTE_ALIGN_PRIMARY=1, instead set block_size to the
++    existing primary (scheduler LCM stays the primary) and pad only the
++    remaining few percent via page_size_padded. Default off.
++    """
++    if os.environ.get("VLLM_KV_PROMOTE_ALIGN_PRIMARY", "").strip() != "1":
++        return None
++    if covering_block <= primary_block:
++        return None
++    if isinstance(spec, MLAAttentionSpec) or spec.tokens_per_state != 1:
++        return None
++    if spec.block_size <= 0 or primary_block % spec.block_size != 0:
++        return None
++    aligned = replace(spec, block_size=primary_block)
++    natural = aligned.unpadded_page_size_bytes
++    if natural <= 0 or natural >= max_page_size:
++        return None
++    padded = replace(aligned, page_size_padded=max_page_size)
++    pad_pct = 100.0 * (max_page_size - natural) / max_page_size
++    logger.info(
++        "Aligning %s block %d -> primary %d; natural page %d B padded to %d B "
++        "(covering %d > primary; pad %.2f%%).",
++        name,
++        spec.block_size,
++        primary_block,
++        natural,
++        max_page_size,
++        covering_block,
++        pad_pct,
++    )
++    return padded
++
++
+ def _promote_indivisible_block_sizes(
+     kv_cache_spec: dict[str, KVCacheSpec], max_page_size: int
+ ) -> tuple[dict[str, KVCacheSpec], int]:
+@@ -1467,6 +1514,12 @@
+                 None,
+             )
+             if divisor is None:
++                aligned = _align_candidate_to_primary_block(
++                    spec, primary_block, max_page_size, new_block_size, name
++                )
++                if aligned is not None:
++                    promoted[name] = aligned
++                    continue
+                 # Nothing between the covering block and the primary block
+                 # divides it. Leave the config alone rather than break the
+                 # scheduler: unify then pads this layer's page at block 16,

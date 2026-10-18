@@ -2,3 +2,11 @@
 # container image via `COPY . .`), so CRLF working trees break it. Force LF
 # regardless of the cloning machine's core.autocrlf.
 * text=auto eol=lf
+
+# Explicit byte preservation for locked source/asset metadata.
+extensions/final/** -text
+assets/** -text
+config/chat-template.jinja -text
+licenses/vllm-* -text
+# A unified diff's blank context line is a literal space.
+patches/qwenstride/** -whitespace

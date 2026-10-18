@@ -1,0 +1,5492 @@
+{
+  "schema_version": 1,
+  "source_analysis_sha256": "50dbad6ec1f2e5d8101bea037434c5e204c2e46c5cca33cc25283ac9c575f0b6",
+  "period": "2026-10-17/18",
+  "scope": "Recorded TP2 GPU comparison; not a new packaging benchmark",
+  "warmup_rounds_per_arm": 1,
+  "formal_rounds_per_arm": 3,
+  "metric_notes": {
+    "upstream_ROW_decode_tps": "Client C / mean TPOT in seconds; excludes own initial TTFT but may include later prefill/queue pauses",
+    "upstream_prefill_input_tps": "Total actual input tokens / full benchmark duration",
+    "mean_tpot_ms": "Mean per-request time per output token, milliseconds; lower is better",
+    "actual_aggregate_output_tps": "Actual total generated output tokens / full benchmark duration"
+  },
+  "primary_cases": [
+    {
+      "case": "cohort_Tdefault_c1",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          127.87051448582956,
+          136.67520706016546,
+          134.71860795736805
+        ],
+        "median": 134.71860795736805,
+        "minimum": 127.87051448582956,
+        "maximum": 136.67520706016546,
+        "arithmetic_mean": 133.08810983445437
+      },
+      "F": {
+        "raw": [
+          129.44791948168194,
+          139.70278335771226,
+          132.2299708277292
+        ],
+        "median": 132.2299708277292,
+        "minimum": 129.44791948168194,
+        "maximum": 139.70278335771226,
+        "arithmetic_mean": 133.79355788904113
+      },
+      "F_relative_H_percent": -1.847285365675977,
+      "F_numerically_better": false,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              203.9736583828926,
+              204.84567468520254,
+              209.58151179365814
+            ],
+            "median": 204.84567468520254,
+            "minimum": 203.9736583828926,
+            "maximum": 209.58151179365814
+          },
+          "F": {
+            "raw": [
+              205.84380405489355,
+              210.4192968690768,
+              206.15111535880715
+            ],
+            "median": 206.15111535880715,
+            "minimum": 205.84380405489355,
+            "maximum": 210.4192968690768
+          },
+          "F_relative_H_percent": 0.637280077116964
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              7.8204111715748095,
+              7.316615950395395,
+              7.422879549916755
+            ],
+            "median": 7.422879549916755,
+            "minimum": 7.316615950395395,
+            "maximum": 7.8204111715748095
+          },
+          "F": {
+            "raw": [
+              7.725114501678099,
+              7.158053518801243,
+              7.562582020855257
+            ],
+            "median": 7.562582020855257,
+            "minimum": 7.158053518801243,
+            "maximum": 7.725114501678099
+          },
+          "F_relative_H_percent": 1.8820522413039775
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              124.17969166375704,
+              133.13849240210186,
+              130.33354283627347
+            ],
+            "median": 130.33354283627347,
+            "minimum": 124.17969166375704,
+            "maximum": 133.13849240210186
+          },
+          "F": {
+            "raw": [
+              125.67345409235351,
+              135.86110048785176,
+              128.10747121848325
+            ],
+            "median": 128.10747121848325,
+            "minimum": 125.67345409235351,
+            "maximum": 135.86110048785176
+          },
+          "F_relative_H_percent": -1.7079805929825942
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              8003,
+              8192,
+              7932
+            ],
+            "median": 8003,
+            "minimum": 7932,
+            "maximum": 8192
+          },
+          "F": {
+            "raw": [
+              8044,
+              8176,
+              7979
+            ],
+            "median": 8044,
+            "minimum": 7979,
+            "maximum": 8176
+          },
+          "F_relative_H_percent": 0.512307884543306
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "cohort_Tdefault_c2",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          235.5976348919271,
+          232.5971279955026,
+          235.53521381744196
+        ],
+        "median": 235.53521381744196,
+        "minimum": 232.5971279955026,
+        "maximum": 235.5976348919271,
+        "arithmetic_mean": 234.5766589016239
+      },
+      "F": {
+        "raw": [
+          234.17161088873578,
+          236.71087297297254,
+          239.00979371072145
+        ],
+        "median": 236.71087297297254,
+        "minimum": 234.17161088873578,
+        "maximum": 239.00979371072145,
+        "arithmetic_mean": 236.63075919080993
+      },
+      "F_relative_H_percent": 0.4991436891647938,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              260.17668878193945,
+              269.3589254049584,
+              257.5713894329965
+            ],
+            "median": 260.17668878193945,
+            "minimum": 257.5713894329965,
+            "maximum": 269.3589254049584
+          },
+          "F": {
+            "raw": [
+              264.4822400761768,
+              269.60250711999834,
+              270.82758222240955
+            ],
+            "median": 269.60250711999834,
+            "minimum": 264.4822400761768,
+            "maximum": 270.82758222240955
+          },
+          "F_relative_H_percent": 3.6228527552516043
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              8.489049565024013,
+              8.598558448402988,
+              8.491299316076597
+            ],
+            "median": 8.491299316076597,
+            "minimum": 8.489049565024013,
+            "maximum": 8.598558448402988
+          },
+          "F": {
+            "raw": [
+              8.540744936628032,
+              8.449126036674954,
+              8.367857939832549
+            ],
+            "median": 8.449126036674954,
+            "minimum": 8.367857939832549,
+            "maximum": 8.540744936628032
+          },
+          "F_relative_H_percent": -0.49666461906243686
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              206.37190811044985,
+              205.196590895649,
+              208.68196036127893
+            ],
+            "median": 206.37190811044985,
+            "minimum": 205.196590895649,
+            "maximum": 208.68196036127893
+          },
+          "F": {
+            "raw": [
+              207.7385075894674,
+              205.89641156881783,
+              215.1626757125121
+            ],
+            "median": 207.7385075894674,
+            "minimum": 205.89641156881783,
+            "maximum": 215.1626757125121
+          },
+          "F_relative_H_percent": 0.662202279142643
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              7718,
+              7731,
+              7796
+            ],
+            "median": 7731,
+            "minimum": 7718,
+            "maximum": 7796
+          },
+          "F": {
+            "raw": [
+              7777,
+              7797,
+              7736
+            ],
+            "median": 7777,
+            "minimum": 7736,
+            "maximum": 7797
+          },
+          "F_relative_H_percent": 0.5950071142154956
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "cohort_Tdefault_c4",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          104.38119778357796,
+          107.66959528173126,
+          107.49599724223259
+        ],
+        "median": 107.49599724223259,
+        "minimum": 104.38119778357796,
+        "maximum": 107.66959528173126,
+        "arithmetic_mean": 106.5155967691806
+      },
+      "F": {
+        "raw": [
+          363.28841667833063,
+          360.1080388366207,
+          358.65118231214035
+        ],
+        "median": 360.1080388366207,
+        "minimum": 358.65118231214035,
+        "maximum": 363.28841667833063,
+        "arithmetic_mean": 360.6825459423639
+      },
+      "F_relative_H_percent": 234.9966957608194,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              420.65857152920216,
+              404.89945106673986,
+              395.2836509561166
+            ],
+            "median": 404.89945106673986,
+            "minimum": 395.2836509561166,
+            "maximum": 420.65857152920216
+          },
+          "F": {
+            "raw": [
+              402.2611801046878,
+              340.8397341845557,
+              327.7792336884886
+            ],
+            "median": 340.8397341845557,
+            "minimum": 327.7792336884886,
+            "maximum": 402.2611801046878
+          },
+          "F_relative_H_percent": -15.821141943614325
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              38.32107778925402,
+              37.15069225934665,
+              37.21068786390584
+            ],
+            "median": 37.21068786390584,
+            "minimum": 37.15069225934665,
+            "maximum": 38.32107778925402
+          },
+          "F": {
+            "raw": [
+              11.010535476394647,
+              11.107777579535737,
+              11.152897849696005
+            ],
+            "median": 11.107777579535737,
+            "minimum": 11.010535476394647,
+            "maximum": 11.152897849696005
+          },
+          "F_relative_H_percent": -70.14895929857234
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              98.07628944001864,
+              102.48788388123069,
+              101.78422328187918
+            ],
+            "median": 101.78422328187918,
+            "minimum": 98.07628944001864,
+            "maximum": 102.48788388123069
+          },
+          "F": {
+            "raw": [
+              300.0515129246956,
+              299.23247687914863,
+              314.2693170581145
+            ],
+            "median": 300.0515129246956,
+            "minimum": 299.23247687914863,
+            "maximum": 314.2693170581145
+          },
+          "F_relative_H_percent": 194.7917695395081
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              7671,
+              7877,
+              7904
+            ],
+            "median": 7877,
+            "minimum": 7671,
+            "maximum": 7904
+          },
+          "F": {
+            "raw": [
+              7663,
+              7867,
+              7831
+            ],
+            "median": 7831,
+            "minimum": 7663,
+            "maximum": 7867
+          },
+          "F_relative_H_percent": -0.5839786720832851
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "cohort_Tdefault_c8",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          239.18392289812874,
+          226.94219057064757,
+          217.50593075752946
+        ],
+        "median": 226.94219057064757,
+        "minimum": 217.50593075752946,
+        "maximum": 239.18392289812874,
+        "arithmetic_mean": 227.87734807543526
+      },
+      "F": {
+        "raw": [
+          693.9659183839832,
+          722.5590424272302,
+          756.039412820235
+        ],
+        "median": 722.5590424272302,
+        "minimum": 693.9659183839832,
+        "maximum": 756.039412820235,
+        "arithmetic_mean": 724.1881245438161
+      },
+      "F_relative_H_percent": 218.38903141383756,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              21631.07023050543,
+              21601.751504000276,
+              22250.74012251571
+            ],
+            "median": 21631.07023050543,
+            "minimum": 21601.751504000276,
+            "maximum": 22250.74012251571
+          },
+          "F": {
+            "raw": [
+              6895.413365447894,
+              6535.563100012951,
+              6293.546059518121
+            ],
+            "median": 6535.563100012951,
+            "minimum": 6293.546059518121,
+            "maximum": 6895.413365447894
+          },
+          "F_relative_H_percent": -69.78622402697343
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              33.44706409639119,
+              35.25126808674909,
+              36.78060626732157
+            ],
+            "median": 35.25126808674909,
+            "minimum": 33.44706409639119,
+            "maximum": 36.78060626732157
+          },
+          "F": {
+            "raw": [
+              11.527943646900342,
+              11.071759579848715,
+              10.581458935001548
+            ],
+            "median": 11.071759579848715,
+            "minimum": 10.581458935001548,
+            "maximum": 11.527943646900342
+          },
+          "F_relative_H_percent": -68.59188284346975
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              109.86500176816672,
+              106.85597367559582,
+              102.97010657298257
+            ],
+            "median": 106.85597367559582,
+            "minimum": 102.97010657298257,
+            "maximum": 109.86500176816672
+          },
+          "F": {
+            "raw": [
+              315.62597865574844,
+              292.98215367333796,
+              323.42758508158545
+            ],
+            "median": 315.62597865574844,
+            "minimum": 292.98215367333796,
+            "maximum": 323.42758508158545
+          },
+          "F_relative_H_percent": 195.37513701756885
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              7900,
+              7725,
+              7834
+            ],
+            "median": 7834,
+            "minimum": 7725,
+            "maximum": 7900
+          },
+          "F": {
+            "raw": [
+              8192,
+              7645,
+              7992
+            ],
+            "median": 7992,
+            "minimum": 7645,
+            "maximum": 8192
+          },
+          "F_relative_H_percent": 2.01684962981874
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "cohort_T0_c1",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          138.68568689600386,
+          138.6296384652376,
+          138.58285799007106
+        ],
+        "median": 138.6296384652376,
+        "minimum": 138.58285799007106,
+        "maximum": 138.68568689600386,
+        "arithmetic_mean": 138.63272778377083
+      },
+      "F": {
+        "raw": [
+          140.95076559251913,
+          140.93701337263423,
+          141.03528453748416
+        ],
+        "median": 140.95076559251913,
+        "minimum": 140.93701337263423,
+        "maximum": 141.03528453748416,
+        "arithmetic_mean": 140.97435450087917
+      },
+      "F_relative_H_percent": 1.6743368539214432,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              208.23413506150246,
+              212.24459970835596,
+              208.0549136735499
+            ],
+            "median": 208.23413506150246,
+            "minimum": 208.0549136735499,
+            "maximum": 212.24459970835596
+          },
+          "F": {
+            "raw": [
+              211.36408706661314,
+              205.06507833488286,
+              207.52764702774584
+            ],
+            "median": 207.52764702774584,
+            "minimum": 205.06507833488286,
+            "maximum": 211.36408706661314
+          },
+          "F_relative_H_percent": -0.33927580295514126
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              7.2105494256943,
+              7.2134646751658185,
+              7.2158996754969955
+            ],
+            "median": 7.2134646751658185,
+            "minimum": 7.2105494256943,
+            "maximum": 7.2158996754969955
+          },
+          "F": {
+            "raw": [
+              7.09467590187445,
+              7.0953681795145105,
+              7.09042423872461
+            ],
+            "median": 7.09467590187445,
+            "minimum": 7.09042423872461,
+            "maximum": 7.0953681795145105
+          },
+          "F_relative_H_percent": -1.6467644695111416
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              133.6807552785913,
+              133.54577510676575,
+              133.58611207560986
+            ],
+            "median": 133.58611207560986,
+            "minimum": 133.54577510676575,
+            "maximum": 133.6807552785913
+          },
+          "F": {
+            "raw": [
+              135.88615697951633,
+              135.99117139126542,
+              136.03807004437152
+            ],
+            "median": 135.99117139126542,
+            "minimum": 135.88615697951633,
+            "maximum": 136.03807004437152
+          },
+          "F_relative_H_percent": 1.800381250929961
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              7785,
+              7785,
+              7785
+            ],
+            "median": 7785,
+            "minimum": 7785,
+            "maximum": 7785
+          },
+          "F": {
+            "raw": [
+              7786,
+              7786,
+              7786
+            ],
+            "median": 7786,
+            "minimum": 7786,
+            "maximum": 7786
+          },
+          "F_relative_H_percent": 0.012845215157364365
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "cohort_T0_c2",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          253.66056939153432,
+          249.31212686313535,
+          253.97023631711446
+        ],
+        "median": 253.66056939153432,
+        "minimum": 249.31212686313535,
+        "maximum": 253.97023631711446,
+        "arithmetic_mean": 252.31431085726138
+      },
+      "F": {
+        "raw": [
+          246.9808899856002,
+          247.9092454957477,
+          244.68279519791628
+        ],
+        "median": 246.9808899856002,
+        "minimum": 244.68279519791628,
+        "maximum": 247.9092454957477,
+        "arithmetic_mean": 246.5243102264214
+      },
+      "F_relative_H_percent": -2.633314047176094,
+      "F_numerically_better": false,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              266.7060764506459,
+              264.17992170900106,
+              258.0906165530905
+            ],
+            "median": 264.17992170900106,
+            "minimum": 258.0906165530905,
+            "maximum": 266.7060764506459
+          },
+          "F": {
+            "raw": [
+              269.58478486631066,
+              275.167440995574,
+              267.8056312724948
+            ],
+            "median": 269.58478486631066,
+            "minimum": 267.8056312724948,
+            "maximum": 275.167440995574
+          },
+          "F_relative_H_percent": 2.045902323819737
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              7.884552198228835,
+              8.022072673175414,
+              7.874938532178011
+            ],
+            "median": 7.884552198228835,
+            "minimum": 7.874938532178011,
+            "maximum": 8.022072673175414
+          },
+          "F": {
+            "raw": [
+              8.09779250579511,
+              8.06746838344238,
+              8.173848097420427
+            ],
+            "median": 8.09779250579511,
+            "minimum": 8.06746838344238,
+            "maximum": 8.173848097420427
+          },
+          "F_relative_H_percent": 2.704532891724365
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              216.187293167939,
+              213.8918349141713,
+              216.5999165392568
+            ],
+            "median": 216.187293167939,
+            "minimum": 213.8918349141713,
+            "maximum": 216.5999165392568
+          },
+          "F": {
+            "raw": [
+              214.26356890832577,
+              212.97470584583772,
+              208.53573353090633
+            ],
+            "median": 212.97470584583772,
+            "minimum": 208.53573353090633,
+            "maximum": 214.26356890832577
+          },
+          "F_relative_H_percent": -1.486020420083467
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              7798,
+              7798,
+              7798
+            ],
+            "median": 7798,
+            "minimum": 7798,
+            "maximum": 7798
+          },
+          "F": {
+            "raw": [
+              7791,
+              7791,
+              7791
+            ],
+            "median": 7791,
+            "minimum": 7791,
+            "maximum": 7791
+          },
+          "F_relative_H_percent": -0.08976660682226134
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "cohort_T0_c4",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          111.62891778871995,
+          118.87720948223537,
+          113.1936115902574
+        ],
+        "median": 113.1936115902574,
+        "minimum": 111.62891778871995,
+        "maximum": 118.87720948223537,
+        "arithmetic_mean": 114.56657962040424
+      },
+      "F": {
+        "raw": [
+          374.9179317623217,
+          376.478156707574,
+          371.79082049710377
+        ],
+        "median": 374.9179317623217,
+        "minimum": 371.79082049710377,
+        "maximum": 376.478156707574,
+        "arithmetic_mean": 374.39563632233313
+      },
+      "F_relative_H_percent": 231.21827857164243,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              435.0135736167431,
+              450.9184255730361,
+              395.84562240634114
+            ],
+            "median": 435.0135736167431,
+            "minimum": 395.84562240634114,
+            "maximum": 450.9184255730361
+          },
+          "F": {
+            "raw": [
+              358.3140866830945,
+              496.9378060195595,
+              391.00618090014905
+            ],
+            "median": 391.00618090014905,
+            "minimum": 358.3140866830945,
+            "maximum": 496.9378060195595
+          },
+          "F_relative_H_percent": -10.116326336834158
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              35.83300885860777,
+              33.64816534154721,
+              35.337683318024645
+            ],
+            "median": 35.337683318024645,
+            "minimum": 33.64816534154721,
+            "maximum": 35.83300885860777
+          },
+          "F": {
+            "raw": [
+              10.669001563082851,
+              10.62478640190263,
+              10.75873792325424
+            ],
+            "median": 10.669001563082851,
+            "minimum": 10.62478640190263,
+            "maximum": 10.75873792325424
+          },
+          "F_relative_H_percent": -69.80842952531377
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              103.60358222305183,
+              110.97308141223712,
+              106.49217531403853
+            ],
+            "median": 106.49217531403853,
+            "minimum": 103.60358222305183,
+            "maximum": 110.97308141223712
+          },
+          "F": {
+            "raw": [
+              320.926645948511,
+              313.1468524995307,
+              316.09722516969765
+            ],
+            "median": 316.09722516969765,
+            "minimum": 313.1468524995307,
+            "maximum": 320.926645948511
+          },
+          "F_relative_H_percent": 196.82671448634358
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              7765,
+              7791,
+              7817
+            ],
+            "median": 7791,
+            "minimum": 7765,
+            "maximum": 7817
+          },
+          "F": {
+            "raw": [
+              7779,
+              7765,
+              7765
+            ],
+            "median": 7765,
+            "minimum": 7765,
+            "maximum": 7779
+          },
+          "F_relative_H_percent": -0.3337183930175791
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "cohort_T0_c8",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          244.10238343820325,
+          251.01702215939355,
+          235.08490673316848
+        ],
+        "median": 244.10238343820325,
+        "minimum": 235.08490673316848,
+        "maximum": 251.01702215939355,
+        "arithmetic_mean": 243.40143744358843
+      },
+      "F": {
+        "raw": [
+          775.0944899712512,
+          761.7520004838096,
+          776.6363415002427
+        ],
+        "median": 775.0944899712512,
+        "minimum": 761.7520004838096,
+        "maximum": 776.6363415002427,
+        "arithmetic_mean": 771.1609439851012
+      },
+      "F_relative_H_percent": 217.52843993326815,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              20562.308221124113,
+              19133.494008448906,
+              20285.05435702391
+            ],
+            "median": 20285.05435702391,
+            "minimum": 19133.494008448906,
+            "maximum": 20562.308221124113
+          },
+          "F": {
+            "raw": [
+              6131.125575513579,
+              6116.600339766592,
+              6453.881263150834
+            ],
+            "median": 6131.125575513579,
+            "minimum": 6116.600339766592,
+            "maximum": 6453.881263150834
+          },
+          "F_relative_H_percent": -69.77515826379526
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              32.77313349963776,
+              31.87034859699703,
+              34.030257880742404
+            ],
+            "median": 32.77313349963776,
+            "minimum": 31.87034859699703,
+            "maximum": 34.030257880742404
+          },
+          "F": {
+            "raw": [
+              10.321322243300589,
+              10.502105665517098,
+              10.300831383381125
+            ],
+            "median": 10.321322243300589,
+            "minimum": 10.300831383381125,
+            "maximum": 10.502105665517098
+          },
+          "F_relative_H_percent": -68.50675800220729
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              113.47325382370843,
+              115.6536895396251,
+              109.41623918599309
+            ],
+            "median": 113.47325382370843,
+            "minimum": 109.41623918599309,
+            "maximum": 115.6536895396251
+          },
+          "F": {
+            "raw": [
+              345.78829037188245,
+              335.74105489010185,
+              315.95891634798056
+            ],
+            "median": 335.74105489010185,
+            "minimum": 315.95891634798056,
+            "maximum": 345.78829037188245
+          },
+          "F_relative_H_percent": 195.87681993477312
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              7792,
+              7791,
+              7765
+            ],
+            "median": 7791,
+            "minimum": 7765,
+            "maximum": 7792
+          },
+          "F": {
+            "raw": [
+              7786,
+              7786,
+              7790
+            ],
+            "median": 7786,
+            "minimum": 7786,
+            "maximum": 7790
+          },
+          "F_relative_H_percent": -0.06417661404184427
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F": {
+            "raw": [
+              1130,
+              1130,
+              1130
+            ],
+            "median": 1130,
+            "minimum": 1130,
+            "maximum": 1130
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_1024_c1",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          1587.6202566920583,
+          1582.7864713504573,
+          1585.3193637201302
+        ],
+        "median": 1585.3193637201302,
+        "minimum": 1582.7864713504573,
+        "maximum": 1587.6202566920583,
+        "arithmetic_mean": 1585.2420305875487
+      },
+      "F": {
+        "raw": [
+          1596.4532555729286,
+          1603.0076084497205,
+          1606.2535412397015
+        ],
+        "median": 1603.0076084497205,
+        "minimum": 1596.4532555729286,
+        "maximum": 1606.2535412397015,
+        "arithmetic_mean": 1601.9048017541168
+      },
+      "F_relative_H_percent": 1.1157527709800164,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              643.6219697934575,
+              645.4024887061678,
+              644.6747450390831
+            ],
+            "median": 644.6747450390831,
+            "minimum": 643.6219697934575,
+            "maximum": 645.4024887061678
+          },
+          "F": {
+            "raw": [
+              640.1632989291102,
+              637.3706789454445,
+              636.1301465658471
+            ],
+            "median": 637.3706789454445,
+            "minimum": 636.1301465658471,
+            "maximum": 640.1632989291102
+          },
+          "F_relative_H_percent": -1.132984679459681
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              1.5504104069258382,
+              1.545689913428181,
+              1.5481634411329397
+            ],
+            "median": 1.5481634411329397,
+            "minimum": 1.545689913428181,
+            "maximum": 1.5504104069258382
+          },
+          "F": {
+            "raw": [
+              1.559036382395438,
+              1.5654371176266801,
+              1.568606973866896
+            ],
+            "median": 1.5654371176266801,
+            "minimum": 1.559036382395438,
+            "maximum": 1.568606973866896
+          },
+          "F_relative_H_percent": 1.1157527709800164
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              16,
+              16,
+              16
+            ],
+            "median": 16,
+            "minimum": 16,
+            "maximum": 16
+          },
+          "F": {
+            "raw": [
+              16,
+              16,
+              16
+            ],
+            "median": 16,
+            "minimum": 16,
+            "maximum": 16
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              16384,
+              16384,
+              16384
+            ],
+            "median": 16384,
+            "minimum": 16384,
+            "maximum": 16384
+          },
+          "F": {
+            "raw": [
+              16384,
+              16384,
+              16384
+            ],
+            "median": 16384,
+            "minimum": 16384,
+            "maximum": 16384
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_1024_c4",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          1663.8050527510031,
+          1659.0566023364222,
+          1669.8362763430057
+        ],
+        "median": 1663.8050527510031,
+        "minimum": 1659.0566023364222,
+        "maximum": 1669.8362763430057,
+        "arithmetic_mean": 1664.2326438101436
+      },
+      "F": {
+        "raw": [
+          1666.1620746560252,
+          1673.2339110644505,
+          1672.9148638509423
+        ],
+        "median": 1672.9148638509423,
+        "minimum": 1666.1620746560252,
+        "maximum": 1673.2339110644505,
+        "arithmetic_mean": 1670.7702831904726
+      },
+      "F_relative_H_percent": 0.5475287555400055,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              2344.738232146483,
+              2351.851229352178,
+              2337.046400498366
+            ],
+            "median": 2344.738232146483,
+            "minimum": 2337.046400498366,
+            "maximum": 2351.851229352178
+          },
+          "F": {
+            "raw": [
+              2342.303867539158,
+              2351.477577991318,
+              2333.192039252026
+            ],
+            "median": 2342.303867539158,
+            "minimum": 2333.192039252026,
+            "maximum": 2351.477577991318
+          },
+          "F_relative_H_percent": -0.10382244695589238
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              1.6248096218271515,
+              1.6201724632191623,
+              1.6306994886162165
+            ],
+            "median": 1.6248096218271515,
+            "minimum": 1.6201724632191623,
+            "maximum": 1.6306994886162165
+          },
+          "F": {
+            "raw": [
+              1.6271114010312746,
+              1.6340174912738774,
+              1.6337059217294359
+            ],
+            "median": 1.6337059217294359,
+            "minimum": 1.6271114010312746,
+            "maximum": 1.6340174912738774
+          },
+          "F_relative_H_percent": 0.5475287555400055
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              32,
+              32,
+              32
+            ],
+            "median": 32,
+            "minimum": 32,
+            "maximum": 32
+          },
+          "F": {
+            "raw": [
+              32,
+              32,
+              32
+            ],
+            "median": 32,
+            "minimum": 32,
+            "maximum": 32
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              32768,
+              32768,
+              32768
+            ],
+            "median": 32768,
+            "minimum": 32768,
+            "maximum": 32768
+          },
+          "F": {
+            "raw": [
+              32768,
+              32768,
+              32768
+            ],
+            "median": 32768,
+            "minimum": 32768,
+            "maximum": 32768
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_1024_c16",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          1668.408661401522,
+          1665.9493488217413,
+          1671.5469124310355
+        ],
+        "median": 1668.408661401522,
+        "minimum": 1665.9493488217413,
+        "maximum": 1671.5469124310355,
+        "arithmetic_mean": 1668.6349742180996
+      },
+      "F": {
+        "raw": [
+          1674.3186048708649,
+          1671.5178954715057,
+          1675.7704870563618
+        ],
+        "median": 1674.3186048708649,
+        "minimum": 1671.5178954715057,
+        "maximum": 1675.7704870563618,
+        "arithmetic_mean": 1673.8689957995775
+      },
+      "F_relative_H_percent": 0.35422637187572104,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              8758.007893135073,
+              8767.759774331353,
+              8736.606923353975
+            ],
+            "median": 8758.007893135073,
+            "minimum": 8736.606923353975,
+            "maximum": 8767.759774331353
+          },
+          "F": {
+            "raw": [
+              8720.94260895392,
+              8735.943372448673,
+              8714.86434317194
+            ],
+            "median": 8720.94260895392,
+            "minimum": 8714.86434317194,
+            "maximum": 8735.943372448673
+          },
+          "F_relative_H_percent": -0.4232159257381629
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              1.629305333399924,
+              1.6269036609587317,
+              1.632370031670933
+            ],
+            "median": 1.629305333399924,
+            "minimum": 1.6269036609587317,
+            "maximum": 1.632370031670933
+          },
+          "F": {
+            "raw": [
+              1.635076762569204,
+              1.6323416947963922,
+              1.6364946162659784
+            ],
+            "median": 1.635076762569204,
+            "minimum": 1.6323416947963922,
+            "maximum": 1.6364946162659784
+          },
+          "F_relative_H_percent": 0.35422637187572104
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              64,
+              64,
+              64
+            ],
+            "median": 64,
+            "minimum": 64,
+            "maximum": 64
+          },
+          "F": {
+            "raw": [
+              64,
+              64,
+              64
+            ],
+            "median": 64,
+            "minimum": 64,
+            "maximum": 64
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              65536,
+              65536,
+              65536
+            ],
+            "median": 65536,
+            "minimum": 65536,
+            "maximum": 65536
+          },
+          "F": {
+            "raw": [
+              65536,
+              65536,
+              65536
+            ],
+            "median": 65536,
+            "minimum": 65536,
+            "maximum": 65536
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_4096_c1",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          1562.599792861379,
+          1571.6025334070691,
+          1572.7810866913067
+        ],
+        "median": 1571.6025334070691,
+        "minimum": 1562.599792861379,
+        "maximum": 1572.7810866913067,
+        "arithmetic_mean": 1568.994470986585
+      },
+      "F": {
+        "raw": [
+          1635.0967565677233,
+          1632.347000527986,
+          1622.4561545036327
+        ],
+        "median": 1632.347000527986,
+        "minimum": 1622.4561545036327,
+        "maximum": 1635.0967565677233,
+        "arithmetic_mean": 1629.9666371997807
+      },
+      "F_relative_H_percent": 3.865129116916677,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              2615.0934860343114,
+              2605.0775995245203,
+              2603.201545542106
+            ],
+            "median": 2605.0775995245203,
+            "minimum": 2603.201545542106,
+            "maximum": 2615.0934860343114
+          },
+          "F": {
+            "raw": [
+              2504.000849206932,
+              2508.1417232286185,
+              2518.0694587761536
+            ],
+            "median": 2508.1417232286185,
+            "minimum": 2504.000849206932,
+            "maximum": 2518.0694587761536
+          },
+          "F_relative_H_percent": -3.7210360379896
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              0.3814940900540476,
+              0.38369202475758524,
+              0.3839797574929948
+            ],
+            "median": 0.38369202475758524,
+            "minimum": 0.3814940900540476,
+            "maximum": 0.3839797574929948
+          },
+          "F": {
+            "raw": [
+              0.39919354408391683,
+              0.39852221692577783,
+              0.39610745959561344
+            ],
+            "median": 0.39852221692577783,
+            "minimum": 0.39610745959561344,
+            "maximum": 0.39919354408391683
+          },
+          "F_relative_H_percent": 3.865129116916677
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              8,
+              8,
+              8
+            ],
+            "median": 8,
+            "minimum": 8,
+            "maximum": 8
+          },
+          "F": {
+            "raw": [
+              8,
+              8,
+              8
+            ],
+            "median": 8,
+            "minimum": 8,
+            "maximum": 8
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              32768,
+              32768,
+              32768
+            ],
+            "median": 32768,
+            "minimum": 32768,
+            "maximum": 32768
+          },
+          "F": {
+            "raw": [
+              32768,
+              32768,
+              32768
+            ],
+            "median": 32768,
+            "minimum": 32768,
+            "maximum": 32768
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_4096_c4",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          1608.7602179121343,
+          1610.7331051686874,
+          1609.083935779529
+        ],
+        "median": 1609.083935779529,
+        "minimum": 1608.7602179121343,
+        "maximum": 1610.7331051686874,
+        "arithmetic_mean": 1609.5257529534501
+      },
+      "F": {
+        "raw": [
+          1663.1652098691168,
+          1657.1561402036043,
+          1663.2685219055704
+        ],
+        "median": 1663.1652098691168,
+        "minimum": 1657.1561402036043,
+        "maximum": 1663.2685219055704,
+        "arithmetic_mean": 1661.1966239927638
+      },
+      "F_relative_H_percent": 3.3609977010545355,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              9257.490719319321,
+              9244.455106498208,
+              9259.743697126396
+            ],
+            "median": 9257.490719319321,
+            "minimum": 9244.455106498208,
+            "maximum": 9259.743697126396
+          },
+          "F": {
+            "raw": [
+              9042.889376461972,
+              9080.227988073602,
+              9040.849306154996
+            ],
+            "median": 9042.889376461972,
+            "minimum": 9040.849306154996,
+            "maximum": 9080.227988073602
+          },
+          "F_relative_H_percent": -2.318137272441456
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              0.39276372507620466,
+              0.3932453870040741,
+              0.39284275775867405
+            ],
+            "median": 0.39284275775867405,
+            "minimum": 0.39276372507620466,
+            "maximum": 0.3932453870040741
+          },
+          "F": {
+            "raw": [
+              0.40604619381570234,
+              0.4045791357918956,
+              0.40607141648085215
+            ],
+            "median": 0.40604619381570234,
+            "minimum": 0.4045791357918956,
+            "maximum": 0.40607141648085215
+          },
+          "F_relative_H_percent": 3.3609977010545355
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              16,
+              16,
+              16
+            ],
+            "median": 16,
+            "minimum": 16,
+            "maximum": 16
+          },
+          "F": {
+            "raw": [
+              16,
+              16,
+              16
+            ],
+            "median": 16,
+            "minimum": 16,
+            "maximum": 16
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              65536,
+              65536,
+              65536
+            ],
+            "median": 65536,
+            "minimum": 65536,
+            "maximum": 65536
+          },
+          "F": {
+            "raw": [
+              65536,
+              65536,
+              65536
+            ],
+            "median": 65536,
+            "minimum": 65536,
+            "maximum": 65536
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_4096_c16",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          1607.925017237623,
+          1606.2266375756744,
+          1607.785726094473
+        ],
+        "median": 1607.785726094473,
+        "minimum": 1606.2266375756744,
+        "maximum": 1607.925017237623,
+        "arithmetic_mean": 1607.3124603025901
+      },
+      "F": {
+        "raw": [
+          1659.4228244083301,
+          1661.6505344197426,
+          1659.5543022255476
+        ],
+        "median": 1659.5543022255476,
+        "minimum": 1659.4228244083301,
+        "maximum": 1661.6505344197426,
+        "arithmetic_mean": 1660.2092203512068
+      },
+      "F_relative_H_percent": 3.219867877346294,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              31313.022636371898,
+              31344.053007254843,
+              31308.742238994455
+            ],
+            "median": 31313.022636371898,
+            "minimum": 31308.742238994455,
+            "maximum": 31344.053007254843
+          },
+          "F": {
+            "raw": [
+              30565.334763523424,
+              30539.830409165006,
+              30533.624048839556
+            ],
+            "median": 30539.830409165006,
+            "minimum": 30533.624048839556,
+            "maximum": 30565.334763523424
+          },
+          "F_relative_H_percent": -2.4692353599514383
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              0.39255981866152906,
+              0.39214517518937364,
+              0.39252581203478343
+            ],
+            "median": 0.39252581203478343,
+            "minimum": 0.39214517518937364,
+            "maximum": 0.39255981866152906
+          },
+          "F": {
+            "raw": [
+              0.405132525490315,
+              0.40567640000481997,
+              0.4051646245667841
+            ],
+            "median": 0.4051646245667841,
+            "minimum": 0.405132525490315,
+            "maximum": 0.40567640000481997
+          },
+          "F_relative_H_percent": 3.219867877346294
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              32,
+              32,
+              32
+            ],
+            "median": 32,
+            "minimum": 32,
+            "maximum": 32
+          },
+          "F": {
+            "raw": [
+              32,
+              32,
+              32
+            ],
+            "median": 32,
+            "minimum": 32,
+            "maximum": 32
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              131072,
+              131072,
+              131072
+            ],
+            "median": 131072,
+            "minimum": 131072,
+            "maximum": 131072
+          },
+          "F": {
+            "raw": [
+              131072,
+              131072,
+              131072
+            ],
+            "median": 131072,
+            "minimum": 131072,
+            "maximum": 131072
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_16384_c1",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          1376.863731523408,
+          1375.2324707850435,
+          1376.703525728336
+        ],
+        "median": 1376.703525728336,
+        "minimum": 1375.2324707850435,
+        "maximum": 1376.863731523408,
+        "arithmetic_mean": 1376.2665760122625
+      },
+      "F": {
+        "raw": [
+          1579.9048694183896,
+          1582.0925870271644,
+          1582.6270355014417
+        ],
+        "median": 1582.0925870271644,
+        "minimum": 1579.9048694183896,
+        "maximum": 1582.6270355014417,
+        "arithmetic_mean": 1581.5414973156653
+      },
+      "F_relative_H_percent": 14.918902832777214,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              11897.959427675232,
+              11912.326825549826,
+              11899.54257174395
+            ],
+            "median": 11899.54257174395,
+            "minimum": 11897.959427675232,
+            "maximum": 11912.326825549826
+          },
+          "F": {
+            "raw": [
+              10368.645146256313,
+              10354.536023922265,
+              10351.227574283257
+            ],
+            "median": 10354.536023922265,
+            "minimum": 10351.227574283257,
+            "maximum": 10368.645146256313
+          },
+          "F_relative_H_percent": -12.983747387822952
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              0.08403709298848926,
+              0.08393752873443869,
+              0.08402731480275488
+            ],
+            "median": 0.08402731480275488,
+            "minimum": 0.08393752873443869,
+            "maximum": 0.08403709298848926
+          },
+          "F": {
+            "raw": [
+              0.09642974056508725,
+              0.0965632682511697,
+              0.09659588839730479
+            ],
+            "median": 0.0965632682511697,
+            "minimum": 0.09642974056508725,
+            "maximum": 0.09659588839730479
+          },
+          "F_relative_H_percent": 14.918902832777214
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              4,
+              4,
+              4
+            ],
+            "median": 4,
+            "minimum": 4,
+            "maximum": 4
+          },
+          "F": {
+            "raw": [
+              4,
+              4,
+              4
+            ],
+            "median": 4,
+            "minimum": 4,
+            "maximum": 4
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              65536,
+              65536,
+              65536
+            ],
+            "median": 65536,
+            "minimum": 65536,
+            "maximum": 65536
+          },
+          "F": {
+            "raw": [
+              65536,
+              65536,
+              65536
+            ],
+            "median": 65536,
+            "minimum": 65536,
+            "maximum": 65536
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_16384_c4",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          1393.2788943770254,
+          1391.2437743942692,
+          1392.7485201802428
+        ],
+        "median": 1392.7485201802428,
+        "minimum": 1391.2437743942692,
+        "maximum": 1393.2788943770254,
+        "arithmetic_mean": 1392.4237296505125
+      },
+      "F": {
+        "raw": [
+          1604.1696138173722,
+          1604.908708362791,
+          1605.2573197487914
+        ],
+        "median": 1604.908708362791,
+        "minimum": 1604.1696138173722,
+        "maximum": 1605.2573197487914,
+        "arithmetic_mean": 1604.7785473096515
+      },
+      "F_relative_H_percent": 15.233201479552916,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              38212.840179214254,
+              38259.91136115044,
+              38220.04004660994
+            ],
+            "median": 38220.04004660994,
+            "minimum": 38212.840179214254,
+            "maximum": 38259.91136115044
+          },
+          "F": {
+            "raw": [
+              33551.10536538996,
+              33526.331640430726,
+              33531.907221418805
+            ],
+            "median": 33531.907221418805,
+            "minimum": 33526.331640430726,
+            "maximum": 33551.10536538996
+          },
+          "F_relative_H_percent": -12.26616408427066
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              0.08503899501812899,
+              0.08491478115199397,
+              0.0850066235461574
+            ],
+            "median": 0.0850066235461574,
+            "minimum": 0.08491478115199397,
+            "maximum": 0.08503899501812899
+          },
+          "F": {
+            "raw": [
+              0.09791074303084547,
+              0.09795585378190863,
+              0.09797713133232369
+            ],
+            "median": 0.09795585378190863,
+            "minimum": 0.09791074303084547,
+            "maximum": 0.09797713133232369
+          },
+          "F_relative_H_percent": 15.233201479552916
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              8,
+              8,
+              8
+            ],
+            "median": 8,
+            "minimum": 8,
+            "maximum": 8
+          },
+          "F": {
+            "raw": [
+              8,
+              8,
+              8
+            ],
+            "median": 8,
+            "minimum": 8,
+            "maximum": 8
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              131072,
+              131072,
+              131072
+            ],
+            "median": 131072,
+            "minimum": 131072,
+            "maximum": 131072
+          },
+          "F": {
+            "raw": [
+              131072,
+              131072,
+              131072
+            ],
+            "median": 131072,
+            "minimum": 131072,
+            "maximum": 131072
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_16384_c8",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          1392.0303665517133,
+          1391.495853948133,
+          1391.747531596454
+        ],
+        "median": 1391.747531596454,
+        "minimum": 1391.495853948133,
+        "maximum": 1392.0303665517133,
+        "arithmetic_mean": 1391.7579173654335
+      },
+      "F": {
+        "raw": [
+          1606.1244619745794,
+          1607.3436441142992,
+          1609.0576517075624
+        ],
+        "median": 1607.3436441142992,
+        "minimum": 1606.1244619745794,
+        "maximum": 1609.0576517075624,
+        "arithmetic_mean": 1607.508585932147
+      },
+      "F_relative_H_percent": 15.491036098374678,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              73547.77582874522,
+              73579.11439653253,
+              73563.39030782692
+            ],
+            "median": 73563.39030782692,
+            "minimum": 73547.77582874522,
+            "maximum": 73579.11439653253
+          },
+          "F": {
+            "raw": [
+              64176.86209996464,
+              64115.964850760065,
+              64070.638199103996
+            ],
+            "median": 64115.964850760065,
+            "minimum": 64070.638199103996,
+            "maximum": 64176.86209996464
+          },
+          "F_relative_H_percent": -12.842563967666509
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              0.0849627909272286,
+              0.08493016686695147,
+              0.08494552805154139
+            ],
+            "median": 0.08494552805154139,
+            "minimum": 0.08493016686695147,
+            "maximum": 0.0849627909272286
+          },
+          "F": {
+            "raw": [
+              0.09803005749356564,
+              0.09810447046596064,
+              0.09820908518722915
+            ],
+            "median": 0.09810447046596064,
+            "minimum": 0.09803005749356564,
+            "maximum": 0.09820908518722915
+          },
+          "F_relative_H_percent": 15.491036098374678
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              16,
+              16,
+              16
+            ],
+            "median": 16,
+            "minimum": 16,
+            "maximum": 16
+          },
+          "F": {
+            "raw": [
+              16,
+              16,
+              16
+            ],
+            "median": 16,
+            "minimum": 16,
+            "maximum": 16
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              262144,
+              262144,
+              262144
+            ],
+            "median": 262144,
+            "minimum": 262144,
+            "maximum": 262144
+          },
+          "F": {
+            "raw": [
+              262144,
+              262144,
+              262144
+            ],
+            "median": 262144,
+            "minimum": 262144,
+            "maximum": 262144
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_65536_c1",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          886.387693670735,
+          887.7441857042791,
+          888.1191129380577
+        ],
+        "median": 887.7441857042791,
+        "minimum": 886.387693670735,
+        "maximum": 888.1191129380577,
+        "arithmetic_mean": 887.4169974376906
+      },
+      "F": {
+        "raw": [
+          1417.9383357674603,
+          1420.3585954656576,
+          1418.9489228492346
+        ],
+        "median": 1418.9489228492346,
+        "minimum": 1417.9383357674603,
+        "maximum": 1420.3585954656576,
+        "arithmetic_mean": 1419.0819513607842
+      },
+      "F_relative_H_percent": 59.8375912452225,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              73932.88735486567,
+              73819.89775970578,
+              73789.0544468537
+            ],
+            "median": 73819.89775970578,
+            "minimum": 73789.0544468537,
+            "maximum": 73932.88735486567
+          },
+          "F": {
+            "raw": [
+              46216.601490508765,
+              46137.587376870215,
+              46183.8733847253
+            ],
+            "median": 46183.8733847253,
+            "minimum": 46137.587376870215,
+            "maximum": 46216.601490508765
+          },
+          "F_relative_H_percent": -37.43709381031609
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              0.013525202845317611,
+              0.013545901271122422,
+              0.013551622206696437
+            ],
+            "median": 0.013545901271122422,
+            "minimum": 0.013525202845317611,
+            "maximum": 0.013551622206696437
+          },
+          "F": {
+            "raw": [
+              0.021636021969107976,
+              0.021672952201319238,
+              0.021651442304218057
+            ],
+            "median": 0.021651442304218057,
+            "minimum": 0.021636021969107976,
+            "maximum": 0.021672952201319238
+          },
+          "F_relative_H_percent": 59.8375912452225
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              2,
+              2,
+              2
+            ],
+            "median": 2,
+            "minimum": 2,
+            "maximum": 2
+          },
+          "F": {
+            "raw": [
+              2,
+              2,
+              2
+            ],
+            "median": 2,
+            "minimum": 2,
+            "maximum": 2
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              131072,
+              131072,
+              131072
+            ],
+            "median": 131072,
+            "minimum": 131072,
+            "maximum": 131072
+          },
+          "F": {
+            "raw": [
+              131072,
+              131072,
+              131072
+            ],
+            "median": 131072,
+            "minimum": 131072,
+            "maximum": 131072
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_65536_c2",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          891.7882989284451,
+          892.2327259846046,
+          891.7842274986441
+        ],
+        "median": 891.7882989284451,
+        "minimum": 891.7842274986441,
+        "maximum": 892.2327259846046,
+        "arithmetic_mean": 891.9350841372312
+      },
+      "F": {
+        "raw": [
+          1430.4338756469344,
+          1431.0145941014464,
+          1432.56204243838
+        ],
+        "median": 1431.0145941014464,
+        "minimum": 1430.4338756469344,
+        "maximum": 1432.56204243838,
+        "arithmetic_mean": 1431.336837395587
+      },
+      "F_relative_H_percent": 60.46572889787014,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              128730.6784845423,
+              128676.56067875214,
+              128725.8878510911
+            ],
+            "median": 128725.8878510911,
+            "minimum": 128676.56067875214,
+            "maximum": 128730.6784845423
+          },
+          "F": {
+            "raw": [
+              80204.52508912422,
+              80158.68659946136,
+              80089.62524170056
+            ],
+            "median": 80158.68659946136,
+            "minimum": 80089.62524170056,
+            "maximum": 80204.52508912422
+          },
+          "F_relative_H_percent": -37.72916393306358
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              0.013607609541754839,
+              0.013614390960458444,
+              0.013607547416666322
+            ],
+            "median": 0.013607609541754839,
+            "minimum": 0.013607547416666322,
+            "maximum": 0.013614390960458444
+          },
+          "F": {
+            "raw": [
+              0.02182668877635093,
+              0.021835549836753027,
+              0.021859162024511415
+            ],
+            "median": 0.021835549836753027,
+            "minimum": 0.02182668877635093,
+            "maximum": 0.021859162024511415
+          },
+          "F_relative_H_percent": 60.46572889787014
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              4,
+              4,
+              4
+            ],
+            "median": 4,
+            "minimum": 4,
+            "maximum": 4
+          },
+          "F": {
+            "raw": [
+              4,
+              4,
+              4
+            ],
+            "median": 4,
+            "minimum": 4,
+            "maximum": 4
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              262144,
+              262144,
+              262144
+            ],
+            "median": 262144,
+            "minimum": 262144,
+            "maximum": 262144
+          },
+          "F": {
+            "raw": [
+              262144,
+              262144,
+              262144
+            ],
+            "median": 262144,
+            "minimum": 262144,
+            "maximum": 262144
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "prefill_102400_c1",
+      "metric": "upstream_prefill_input_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          698.1981857426023,
+          698.4843990116715,
+          698.5309056890022
+        ],
+        "median": 698.4843990116715,
+        "minimum": 698.1981857426023,
+        "maximum": 698.5309056890022,
+        "arithmetic_mean": 698.4044968144253
+      },
+      "F": {
+        "raw": [
+          1306.3055994500396,
+          1308.997878588868,
+          1308.2982221476927
+        ],
+        "median": 1308.2982221476927,
+        "minimum": 1306.3055994500396,
+        "maximum": 1308.997878588868,
+        "arithmetic_mean": 1307.8672333955335
+      },
+      "F_relative_H_percent": 87.30528899412562,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              146659.81759643182,
+              146598.67443796247,
+              146589.39553331584
+            ],
+            "median": 146598.67443796247,
+            "minimum": 146589.39553331584,
+            "maximum": 146659.81759643182
+          },
+          "F": {
+            "raw": [
+              78385.30596299097,
+              78223.86102331802,
+              78266.09117398039
+            ],
+            "median": 78266.09117398039,
+            "minimum": 78223.86102331802,
+            "maximum": 78385.30596299097
+          },
+          "F_relative_H_percent": -46.612006231269866
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              0.0068183416576426,
+              0.006821136709098354,
+              0.006821590875869162
+            ],
+            "median": 0.006821136709098354,
+            "minimum": 0.0068183416576426,
+            "maximum": 0.006821590875869162
+          },
+          "F": {
+            "raw": [
+              0.012756890619629294,
+              0.012783182408094415,
+              0.012776349825661063
+            ],
+            "median": 0.012776349825661063,
+            "minimum": 0.012756890619629294,
+            "maximum": 0.012783182408094415
+          },
+          "F_relative_H_percent": 87.30528899412565
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              2,
+              2,
+              2
+            ],
+            "median": 2,
+            "minimum": 2,
+            "maximum": 2
+          },
+          "F": {
+            "raw": [
+              2,
+              2,
+              2
+            ],
+            "median": 2,
+            "minimum": 2,
+            "maximum": 2
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              204800,
+              204800,
+              204800
+            ],
+            "median": 204800,
+            "minimum": 204800,
+            "maximum": 204800
+          },
+          "F": {
+            "raw": [
+              204800,
+              204800,
+              204800
+            ],
+            "median": 204800,
+            "minimum": 204800,
+            "maximum": 204800
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "long_100k",
+      "metric": "mean_tpot_ms",
+      "higher_is_better": false,
+      "H": {
+        "raw": [
+          9.734943195008764,
+          18.413688498092633,
+          9.804760617222273
+        ],
+        "median": 9.804760617222273,
+        "minimum": 9.734943195008764,
+        "maximum": 18.413688498092633,
+        "arithmetic_mean": 12.65113077010789
+      },
+      "F": {
+        "raw": [
+          14.204750173524316,
+          7.296843264324992,
+          7.006789579549257
+        ],
+        "median": 7.296843264324992,
+        "minimum": 7.006789579549257,
+        "maximum": 14.204750173524316,
+        "arithmetic_mean": 9.502794339132855
+      },
+      "F_relative_H_percent": -25.578567910083095,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              141193.23367625475,
+              140924.8664593324,
+              140947.89148308337
+            ],
+            "median": 140947.89148308337,
+            "minimum": 140924.8664593324,
+            "maximum": 141193.23367625475
+          },
+          "F": {
+            "raw": [
+              76181.30983226001,
+              75964.76640366018,
+              75881.78695179522
+            ],
+            "median": 75964.76640366018,
+            "minimum": 75881.78695179522,
+            "maximum": 76181.30983226001
+          },
+          "F_relative_H_percent": -46.10436126121298
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              9.734943195008764,
+              18.413688498092633,
+              9.804760617222273
+            ],
+            "median": 9.804760617222273,
+            "minimum": 9.734943195008764,
+            "maximum": 18.413688498092633
+          },
+          "F": {
+            "raw": [
+              14.204750173524316,
+              7.296843264324992,
+              7.006789579549257
+            ],
+            "median": 7.296843264324992,
+            "minimum": 7.006789579549257,
+            "maximum": 14.204750173524316
+          },
+          "F_relative_H_percent": -25.578567910083095
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              1.7817215968345534,
+              1.7579247175197872,
+              1.7845309171240382
+            ],
+            "median": 1.7817215968345534,
+            "minimum": 1.7579247175197872,
+            "maximum": 1.7845309171240382
+          },
+          "F": {
+            "raw": [
+              3.2075216143556355,
+              3.2891808059528733,
+              3.295832784879085
+            ],
+            "median": 3.2891808059528733,
+            "minimum": 3.2075216143556355,
+            "maximum": 3.295832784879085
+          },
+          "F_relative_H_percent": 84.60688874156914
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              41.44725631345579,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              66.10032775744982,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              256,
+              256,
+              256
+            ],
+            "median": 256,
+            "minimum": 256,
+            "maximum": 256
+          },
+          "F": {
+            "raw": [
+              256,
+              256,
+              256
+            ],
+            "median": 256,
+            "minimum": 256,
+            "maximum": 256
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              100000,
+              100000,
+              100000
+            ],
+            "median": 100000,
+            "minimum": 100000,
+            "maximum": 100000
+          },
+          "F": {
+            "raw": [
+              100000,
+              100000,
+              100000
+            ],
+            "median": 100000,
+            "minimum": 100000,
+            "maximum": 100000
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "long_4x60k",
+      "metric": "actual_aggregate_output_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          14.351934272075617,
+          14.571513721315934,
+          14.560830767561095
+        ],
+        "median": 14.560830767561095,
+        "minimum": 14.351934272075617,
+        "maximum": 14.571513721315934,
+        "arithmetic_mean": 14.494759586984216
+      },
+      "F": {
+        "raw": [
+          22.16642013676078,
+          21.81446661014357,
+          20.727930220418727
+        ],
+        "median": 21.81446661014357,
+        "minimum": 20.727930220418727,
+        "maximum": 22.16642013676078,
+        "arithmetic_mean": 21.56960565577436
+      },
+      "F_relative_H_percent": 49.816085073540364,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              163461.27723227255,
+              163579.88003990613,
+              163670.69966811687
+            ],
+            "median": 163579.88003990613,
+            "minimum": 163461.27723227255,
+            "maximum": 163670.69966811687
+          },
+          "F": {
+            "raw": [
+              109648.75988662243,
+              109410.34562047571,
+              109295.18109187484
+            ],
+            "median": 109410.34562047571,
+            "minimum": 109295.18109187484,
+            "maximum": 109648.75988662243
+          },
+          "F_relative_H_percent": -33.115034933523305
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              118.61400621877628,
+              113.42950454568954,
+              112.37091743155132
+            ],
+            "median": 113.42950454568954,
+            "minimum": 112.37091743155132,
+            "maximum": 118.61400621877628
+          },
+          "F": {
+            "raw": [
+              72.01483959372165,
+              72.92039182860103,
+              77.71504386660449
+            ],
+            "median": 72.92039182860103,
+            "minimum": 72.01483959372165,
+            "maximum": 77.71504386660449
+          },
+          "F_relative_H_percent": -35.71302976182127
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              14.351934272075617,
+              14.571513721315934,
+              14.560830767561095
+            ],
+            "median": 14.560830767561095,
+            "minimum": 14.351934272075617,
+            "maximum": 14.571513721315934
+          },
+          "F": {
+            "raw": [
+              22.16642013676078,
+              21.81446661014357,
+              20.727930220418727
+            ],
+            "median": 21.81446661014357,
+            "minimum": 20.727930220418727,
+            "maximum": 22.16642013676078
+          },
+          "F_relative_H_percent": 49.816085073540364
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              135.80031687822617,
+              159.81246185977008,
+              164.98285545667252
+            ],
+            "median": 159.81246185977008,
+            "minimum": 135.80031687822617,
+            "maximum": 164.98285545667252
+          },
+          "F": {
+            "raw": [
+              435.8292488805245,
+              402.02481442903775,
+              299.16224347758634
+            ],
+            "median": 402.02481442903775,
+            "minimum": 299.16224347758634,
+            "maximum": 435.8292488805245
+          },
+          "F_relative_H_percent": 151.5603662884567
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              240000,
+              240000,
+              240000
+            ],
+            "median": 240000,
+            "minimum": 240000,
+            "maximum": 240000
+          },
+          "F": {
+            "raw": [
+              240000,
+              240000,
+              240000
+            ],
+            "median": 240000,
+            "minimum": 240000,
+            "maximum": 240000
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "context_1024_c1",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          220.3191569081679,
+          206.69594755601963,
+          125.50199362501111
+        ],
+        "median": 206.69594755601963,
+        "minimum": 125.50199362501111,
+        "maximum": 220.3191569081679,
+        "arithmetic_mean": 184.17236602973287
+      },
+      "F": {
+        "raw": [
+          221.4888570260725,
+          173.7034465014931,
+          149.41707096860694
+        ],
+        "median": 173.7034465014931,
+        "minimum": 149.41707096860694,
+        "maximum": 221.4888570260725,
+        "arithmetic_mean": 181.53645816539085
+      },
+      "F_relative_H_percent": -15.96185191080477,
+      "F_numerically_better": false,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              742.9235139861703,
+              742.762353271246,
+              731.0429746285081
+            ],
+            "median": 742.762353271246,
+            "minimum": 731.0429746285081,
+            "maximum": 742.9235139861703
+          },
+          "F": {
+            "raw": [
+              705.4940946400166,
+              701.9335245713592,
+              706.6964851692319
+            ],
+            "median": 705.4940946400166,
+            "minimum": 701.9335245713592,
+            "maximum": 706.6964851692319
+          },
+          "F_relative_H_percent": -5.017521212147324
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              4.538869946823616,
+              4.838024217813828,
+              7.968000914693928
+            ],
+            "median": 4.838024217813828,
+            "minimum": 4.538869946823616,
+            "maximum": 7.968000914693928
+          },
+          "F": {
+            "raw": [
+              4.514899816753695,
+              5.756938161796372,
+              6.692675699753903
+            ],
+            "median": 5.756938161796372,
+            "minimum": 4.514899816753695,
+            "maximum": 6.692675699753903
+          },
+          "F_relative_H_percent": 18.9935788373911
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              190.02552571391809,
+              179.85439868412996,
+              115.26349134478038
+            ],
+            "median": 179.85439868412996,
+            "minimum": 115.26349134478038,
+            "maximum": 190.02552571391809
+          },
+          "F": {
+            "raw": [
+              192.26654854331213,
+              155.30247851491572,
+              135.11568125250332
+            ],
+            "median": 155.30247851491572,
+            "minimum": 135.11568125250332,
+            "maximum": 192.26654854331213
+          },
+          "F_relative_H_percent": -13.65099788987294
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              221.69285492305548,
+              215.4600997970675,
+              124.1573443977545
+            ],
+            "median": 215.4600997970675,
+            "minimum": 124.1573443977545,
+            "maximum": 221.69285492305548
+          },
+          "F": {
+            "raw": [
+              225.2244840149917,
+              175.49903331603002,
+              148.13688977587168
+            ],
+            "median": 175.49903331603002,
+            "minimum": 148.13688977587168,
+            "maximum": 225.2244840149917
+          },
+          "F_relative_H_percent": -18.54685230289741
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "context_1024_c4",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          165.74341757112958,
+          173.56455951079064,
+          167.45828252058408
+        ],
+        "median": 167.45828252058408,
+        "minimum": 165.74341757112958,
+        "maximum": 173.56455951079064,
+        "arithmetic_mean": 168.9220865341681
+      },
+      "F": {
+        "raw": [
+          538.4523837585211,
+          511.21878278907315,
+          543.8291792870975
+        ],
+        "median": 538.4523837585211,
+        "minimum": 511.21878278907315,
+        "maximum": 543.8291792870975,
+        "arithmetic_mean": 531.1667819448973
+      },
+      "F_relative_H_percent": 221.54419336788206,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              1955.9966081287712,
+              1936.2299165222794,
+              1947.3167480900884
+            ],
+            "median": 1947.3167480900884,
+            "minimum": 1936.2299165222794,
+            "maximum": 1955.9966081287712
+          },
+          "F": {
+            "raw": [
+              1922.183671966195,
+              1925.4726369399577,
+              1922.2862429451197
+            ],
+            "median": 1922.2862429451197,
+            "minimum": 1922.183671966195,
+            "maximum": 1925.4726369399577
+          },
+          "F_relative_H_percent": -1.2853843715727509
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              24.133688436123748,
+              23.04617953846342,
+              23.886546188053238
+            ],
+            "median": 23.886546188053238,
+            "minimum": 23.04617953846342,
+            "maximum": 24.133688436123748
+          },
+          "F": {
+            "raw": [
+              7.428697728254229,
+              7.824438644795225,
+              7.355250788939969
+            ],
+            "median": 7.428697728254229,
+            "minimum": 7.355250788939969,
+            "maximum": 7.824438644795225
+          },
+          "F_relative_H_percent": -68.90007592654955
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              150.82256630200374,
+              159.83473059769642,
+              153.92959009330085
+            ],
+            "median": 153.92959009330085,
+            "minimum": 150.82256630200374,
+            "maximum": 159.83473059769642
+          },
+          "F": {
+            "raw": [
+              410.23917235968844,
+              349.19439011818775,
+              424.71023369456736
+            ],
+            "median": 410.23917235968844,
+            "minimum": 349.19439011818775,
+            "maximum": 424.71023369456736
+          },
+          "F_relative_H_percent": 166.51092367038171
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              166.13557566831074,
+              179.63302659570797,
+              172.15345601878232
+            ],
+            "median": 172.15345601878232,
+            "minimum": 166.13557566831074,
+            "maximum": 179.63302659570797
+          },
+          "F": {
+            "raw": [
+              595.9010799160866,
+              550.4089472075832,
+              607.8072953538596
+            ],
+            "median": 595.9010799160866,
+            "minimum": 550.4089472075832,
+            "maximum": 607.8072953538596
+          },
+          "F_relative_H_percent": 246.14529019450674
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "context_4096_c1",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          208.96211991056447,
+          122.19501251423941,
+          188.9511108892721
+        ],
+        "median": 188.9511108892721,
+        "minimum": 122.19501251423941,
+        "maximum": 208.96211991056447,
+        "arithmetic_mean": 173.36941443802533
+      },
+      "F": {
+        "raw": [
+          215.16103807642295,
+          211.3589162379037,
+          194.90804114526958
+        ],
+        "median": 211.3589162379037,
+        "minimum": 194.90804114526958,
+        "maximum": 215.16103807642295,
+        "arithmetic_mean": 207.14266515319875
+      },
+      "F_relative_H_percent": 11.859049276382883,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              2669.598178938031,
+              2655.003633350134,
+              2674.5169116184115
+            ],
+            "median": 2669.598178938031,
+            "minimum": 2655.003633350134,
+            "maximum": 2674.5169116184115
+          },
+          "F": {
+            "raw": [
+              2576.983052305877,
+              2601.829670369625,
+              2567.7784709259868
+            ],
+            "median": 2576.983052305877,
+            "minimum": 2567.7784709259868,
+            "maximum": 2601.829670369625
+          },
+          "F_relative_H_percent": -3.4692534390698637
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              4.785556350729974,
+              8.183640063733941,
+              5.292374282922388
+            ],
+            "median": 5.292374282922388,
+            "minimum": 4.785556350729974,
+            "maximum": 8.183640063733941
+          },
+          "F": {
+            "raw": [
+              4.647681610667869,
+              4.731288453780719,
+              5.130624648034281
+            ],
+            "median": 4.731288453780719,
+            "minimum": 4.647681610667869,
+            "maximum": 5.130624648034281
+          },
+          "F_relative_H_percent": -10.601779072054674
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              135.3246508202131,
+              92.85082718789208,
+              126.5654531046948
+            ],
+            "median": 126.5654531046948,
+            "minimum": 92.85082718789208,
+            "maximum": 135.3246508202131
+          },
+          "F": {
+            "raw": [
+              139.6374532749146,
+              137.56423383879604,
+              130.97280533003797
+            ],
+            "median": 137.56423383879604,
+            "minimum": 130.97280533003797,
+            "maximum": 139.6374532749146
+          },
+          "F_relative_H_percent": 8.690191884354936
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              213.68436961291525,
+              114.65083892987431,
+              192.29626207165202
+            ],
+            "median": 192.29626207165202,
+            "minimum": 114.65083892987431,
+            "maximum": 213.68436961291525
+          },
+          "F": {
+            "raw": [
+              220.28720233215094,
+              219.46231263069953,
+              198.4955810310762
+            ],
+            "median": 219.46231263069953,
+            "minimum": 198.4955810310762,
+            "maximum": 220.28720233215094
+          },
+          "F_relative_H_percent": 14.127185971469935
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "context_4096_c4",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          151.017959057123,
+          151.59365377733891,
+          140.3789080945405
+        ],
+        "median": 151.017959057123,
+        "minimum": 140.3789080945405,
+        "maximum": 151.59365377733891,
+        "arithmetic_mean": 147.66350697633413
+      },
+      "F": {
+        "raw": [
+          371.1197768153368,
+          392.591726634178,
+          337.15223943204137
+        ],
+        "median": 371.1197768153368,
+        "minimum": 337.15223943204137,
+        "maximum": 392.591726634178,
+        "arithmetic_mean": 366.95458096051874
+      },
+      "F_relative_H_percent": 145.74545910460864,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              6692.821763688698,
+              6666.965135838836,
+              6676.518330350518
+            ],
+            "median": 6676.518330350518,
+            "minimum": 6666.965135838836,
+            "maximum": 6692.821763688698
+          },
+          "F": {
+            "raw": [
+              6815.128120593727,
+              6821.421670494601,
+              6851.899590343237
+            ],
+            "median": 6821.421670494601,
+            "minimum": 6815.128120593727,
+            "maximum": 6851.899590343237
+          },
+          "F_relative_H_percent": 2.1703428789429546
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              26.486916026238895,
+              26.386328849063883,
+              28.494309111637584
+            ],
+            "median": 26.486916026238895,
+            "minimum": 26.386328849063883,
+            "maximum": 28.494309111637584
+          },
+          "F": {
+            "raw": [
+              10.778191435457602,
+              10.188701718941855,
+              11.864076616362699
+            ],
+            "median": 10.778191435457602,
+            "minimum": 10.188701718941855,
+            "maximum": 11.864076616362699
+          },
+          "F_relative_H_percent": -59.30748817725575
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              115.55004009167627,
+              119.687019479556,
+              109.63533347948552
+            ],
+            "median": 115.55004009167627,
+            "minimum": 109.63533347948552,
+            "maximum": 119.687019479556
+          },
+          "F": {
+            "raw": [
+              206.28152116036117,
+              228.95697747851844,
+              190.68837291338093
+            ],
+            "median": 206.28152116036117,
+            "minimum": 190.68837291338093,
+            "maximum": 228.95697747851844
+          },
+          "F_relative_H_percent": 78.52137567126714
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              154.63810993836464,
+              172.75960466258104,
+              141.34465967025298
+            ],
+            "median": 154.63810993836464,
+            "minimum": 141.34465967025298,
+            "maximum": 172.75960466258104
+          },
+          "F": {
+            "raw": [
+              495.80074812490307,
+              561.7522958923419,
+              435.36199997756927
+            ],
+            "median": 495.80074812490307,
+            "minimum": 435.36199997756927,
+            "maximum": 561.7522958923419
+          },
+          "F_relative_H_percent": 220.62002589304694
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              16384,
+              16384,
+              16384
+            ],
+            "median": 16384,
+            "minimum": 16384,
+            "maximum": 16384
+          },
+          "F": {
+            "raw": [
+              16384,
+              16384,
+              16384
+            ],
+            "median": 16384,
+            "minimum": 16384,
+            "maximum": 16384
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "context_16384_c1",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          180.82706788171603,
+          185.38123783276015,
+          187.38834311678713
+        ],
+        "median": 185.38123783276015,
+        "minimum": 180.82706788171603,
+        "maximum": 187.38834311678713,
+        "arithmetic_mean": 184.53221627708777
+      },
+      "F": {
+        "raw": [
+          196.73710125739078,
+          204.49910631471442,
+          204.2789447563197
+        ],
+        "median": 204.2789447563197,
+        "minimum": 196.73710125739078,
+        "maximum": 204.49910631471442,
+        "arithmetic_mean": 201.83838410947496
+      },
+      "F_relative_H_percent": 10.193969543243607,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              11950.032052583992,
+              11898.579532280564,
+              11948.616280220449
+            ],
+            "median": 11948.616280220449,
+            "minimum": 11898.579532280564,
+            "maximum": 11950.032052583992
+          },
+          "F": {
+            "raw": [
+              10453.133969567716,
+              10392.35763065517,
+              10417.229435406625
+            ],
+            "median": 10417.229435406625,
+            "minimum": 10392.35763065517,
+            "maximum": 10453.133969567716
+          },
+          "F_relative_H_percent": -12.816436722876922
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              5.530145523645428,
+              5.394289150783102,
+              5.336511243801137
+            ],
+            "median": 5.394289150783102,
+            "minimum": 5.336511243801137,
+            "maximum": 5.530145523645428
+          },
+          "F": {
+            "raw": [
+              5.0829253537272665,
+              4.889996919893857,
+              4.895267112295299
+            ],
+            "median": 4.895267112295299,
+            "minimum": 4.889996919893857,
+            "maximum": 5.0829253537272665
+          },
+          "F_relative_H_percent": -9.250932320069627
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              58.14956476349852,
+              58.78470469791325,
+              58.814543561430526
+            ],
+            "median": 58.78470469791325,
+            "minimum": 58.14956476349852,
+            "maximum": 58.814543561430526
+          },
+          "F": {
+            "raw": [
+              65.40602516486273,
+              66.50453397937368,
+              66.37549866120813
+            ],
+            "median": 66.37549866120813,
+            "minimum": 65.40602516486273,
+            "maximum": 66.50453397937368
+          },
+          "F_relative_H_percent": 12.912872493453786
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              185.3962667972863,
+              192.1823907172554,
+              193.1219352120195
+            ],
+            "median": 192.1823907172554,
+            "minimum": 185.3962667972863,
+            "maximum": 193.1219352120195
+          },
+          "F": {
+            "raw": [
+              211.04993192806504,
+              210.29331840660294,
+              210.2498544644059
+            ],
+            "median": 210.29331840660294,
+            "minimum": 210.2498544644059,
+            "maximum": 211.04993192806504
+          },
+          "F_relative_H_percent": 9.423822662292135
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              16384,
+              16384,
+              16384
+            ],
+            "median": 16384,
+            "minimum": 16384,
+            "maximum": 16384
+          },
+          "F": {
+            "raw": [
+              16384,
+              16384,
+              16384
+            ],
+            "median": 16384,
+            "minimum": 16384,
+            "maximum": 16384
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "context_16384_c4",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          103.68009874051596,
+          100.99143693878916,
+          98.62202259240466
+        ],
+        "median": 100.99143693878916,
+        "minimum": 98.62202259240466,
+        "maximum": 103.68009874051596,
+        "arithmetic_mean": 101.0978527572366
+      },
+      "F": {
+        "raw": [
+          178.27213582446112,
+          185.2539382650174,
+          177.10624598223043
+        ],
+        "median": 178.27213582446112,
+        "minimum": 177.10624598223043,
+        "maximum": 185.2539382650174,
+        "arithmetic_mean": 180.21077335723632
+      },
+      "F_relative_H_percent": 76.52203120202333,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              29859.62912393734,
+              29817.88826873526,
+              29830.17345960252
+            ],
+            "median": 29830.17345960252,
+            "minimum": 29817.88826873526,
+            "maximum": 29859.62912393734
+          },
+          "F": {
+            "raw": [
+              26873.9492027089,
+              26854.003333486617,
+              26800.48807966523
+            ],
+            "median": 26854.003333486617,
+            "minimum": 26800.48807966523,
+            "maximum": 26873.9492027089
+          },
+          "F_relative_H_percent": -9.977045993870526
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              38.580210171394114,
+              39.60731841477211,
+              40.55889237368022
+            ],
+            "median": 39.60731841477211,
+            "minimum": 38.580210171394114,
+            "maximum": 40.55889237368022
+          },
+          "F": {
+            "raw": [
+              22.43760631183929,
+              21.591983616983885,
+              22.585313001334416
+            ],
+            "median": 22.43760631183929,
+            "minimum": 21.591983616983885,
+            "maximum": 22.585313001334416
+          },
+          "F_relative_H_percent": -43.34984742751262
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              56.36970199309827,
+              55.75667514053482,
+              55.75350790463116
+            ],
+            "median": 55.75667514053482,
+            "minimum": 55.75350790463116,
+            "maximum": 56.36970199309827
+          },
+          "F": {
+            "raw": [
+              76.7846649246059,
+              83.25387829642958,
+              79.24540301879972
+            ],
+            "median": 79.24540301879972,
+            "minimum": 76.7846649246059,
+            "maximum": 83.25387829642958
+          },
+          "F_relative_H_percent": 42.12720327935895
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              168.1892441724755,
+              150.96273405860654,
+              154.15651078501114
+            ],
+            "median": 154.15651078501114,
+            "minimum": 150.96273405860654,
+            "maximum": 168.1892441724755
+          },
+          "F": {
+            "raw": [
+              509.5382854735972,
+              576.3690810799184,
+              496.2322145757394
+            ],
+            "median": 509.5382854735972,
+            "minimum": 496.2322145757394,
+            "maximum": 576.3690810799184
+          },
+          "F_relative_H_percent": 230.5330945017344
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              65536,
+              65536,
+              65536
+            ],
+            "median": 65536,
+            "minimum": 65536,
+            "maximum": 65536
+          },
+          "F": {
+            "raw": [
+              65536,
+              65536,
+              65536
+            ],
+            "median": 65536,
+            "minimum": 65536,
+            "maximum": 65536
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "context_65536_c1",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          138.99773457982752,
+          139.61057036286485,
+          139.8031406673085
+        ],
+        "median": 139.61057036286485,
+        "minimum": 138.99773457982752,
+        "maximum": 139.8031406673085,
+        "arithmetic_mean": 139.4704818700003
+      },
+      "F": {
+        "raw": [
+          179.00314755862618,
+          179.23292694340066,
+          179.46124979075879
+        ],
+        "median": 179.23292694340066,
+        "minimum": 179.00314755862618,
+        "maximum": 179.46124979075879,
+        "arithmetic_mean": 179.23244143092853
+      },
+      "F_relative_H_percent": 28.38062796932388,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              73456.67574740946,
+              73337.94504031539,
+              73472.13761415333
+            ],
+            "median": 73456.67574740946,
+            "minimum": 73337.94504031539,
+            "maximum": 73472.13761415333
+          },
+          "F": {
+            "raw": [
+              46024.38013534993,
+              45977.906038053334,
+              45955.71192819625
+            ],
+            "median": 45977.906038053334,
+            "minimum": 45955.71192819625,
+            "maximum": 46024.38013534993
+          },
+          "F_relative_H_percent": -37.40813129612008
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              7.1943618579315185,
+              7.16278142407755,
+              7.152915129279636
+            ],
+            "median": 7.16278142407755,
+            "minimum": 7.152915129279636,
+            "maximum": 7.1943618579315185
+          },
+          "F": {
+            "raw": [
+              5.586493945155267,
+              5.579331973503878,
+              5.572233566666569
+            ],
+            "median": 5.579331973503878,
+            "minimum": 5.572233566666569,
+            "maximum": 5.586493945155267
+          },
+          "F_relative_H_percent": -22.10662809353553
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              12.669925744982427,
+              12.693646749123529,
+              12.67432561653965
+            ],
+            "median": 12.67432561653965,
+            "minimum": 12.669925744982427,
+            "maximum": 12.693646749123529
+          },
+          "F": {
+            "raw": [
+              19.789622390650543,
+              19.81063782363216,
+              19.8224389276556
+            ],
+            "median": 19.81063782363216,
+            "minimum": 19.789622390650543,
+            "maximum": 19.8224389276556
+          },
+          "F_relative_H_percent": 56.305261699918915
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              138.8725941071095,
+              139.31237048517465,
+              139.58837466830593
+            ],
+            "median": 139.31237048517465,
+            "minimum": 138.8725941071095,
+            "maximum": 139.58837466830593
+          },
+          "F": {
+            "raw": [
+              178.87492406039138,
+              178.0804433154243,
+              178.56715121702345
+            ],
+            "median": 178.56715121702345,
+            "minimum": 178.0804433154243,
+            "maximum": 178.87492406039138
+          },
+          "F_relative_H_percent": 28.17752694548128
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              65536,
+              65536,
+              65536
+            ],
+            "median": 65536,
+            "minimum": 65536,
+            "maximum": 65536
+          },
+          "F": {
+            "raw": [
+              65536,
+              65536,
+              65536
+            ],
+            "median": 65536,
+            "minimum": 65536,
+            "maximum": 65536
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "context_65536_c4",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          32.6879111690228,
+          32.09019128705452,
+          32.55006635172621
+        ],
+        "median": 32.55006635172621,
+        "minimum": 32.09019128705452,
+        "maximum": 32.6879111690228,
+        "arithmetic_mean": 32.44272293593451
+      },
+      "F": {
+        "raw": [
+          50.701418841051364,
+          49.47039724291322,
+          50.49422409384307
+        ],
+        "median": 50.49422409384307,
+        "minimum": 49.47039724291322,
+        "maximum": 50.701418841051364,
+        "arithmetic_mean": 50.222013392602555
+      },
+      "F_relative_H_percent": 55.12786839884658,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              185518.26557400636,
+              185589.25658627413,
+              185640.18188766204
+            ],
+            "median": 185589.25658627413,
+            "minimum": 185518.26557400636,
+            "maximum": 185640.18188766204
+          },
+          "F": {
+            "raw": [
+              120845.20721668378,
+              120852.47042495757,
+              121003.13984439708
+            ],
+            "median": 120852.47042495757,
+            "minimum": 120845.20721668378,
+            "maximum": 121003.13984439708
+          },
+          "F_relative_H_percent": -34.88175304545316
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              122.36939764418662,
+              124.64868047120792,
+              122.88761432241658
+            ],
+            "median": 122.88761432241658,
+            "minimum": 122.36939764418662,
+            "maximum": 124.64868047120792
+          },
+          "F": {
+            "raw": [
+              78.89325568067386,
+              80.85643582684212,
+              79.21698118513585
+            ],
+            "median": 79.21698118513585,
+            "minimum": 78.89325568067386,
+            "maximum": 80.85643582684212
+          },
+          "F_relative_H_percent": -35.53705015600953
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              13.075394282868821,
+              12.776745643231678,
+              12.998673351753293
+            ],
+            "median": 12.998673351753293,
+            "minimum": 12.776745643231678,
+            "maximum": 13.075394282868821
+          },
+          "F": {
+            "raw": [
+              20.12402001995684,
+              19.57799941502175,
+              20.094918129158682
+            ],
+            "median": 20.094918129158682,
+            "minimum": 19.57799941502175,
+            "maximum": 20.12402001995684
+          },
+          "F_relative_H_percent": 54.592069401053365
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              174.41817474921626,
+              160.12896852915972,
+              168.4990313417111
+            ],
+            "median": 168.4990313417111,
+            "minimum": 160.12896852915972,
+            "maximum": 174.41817474921626
+          },
+          "F": {
+            "raw": [
+              463.8626697582462,
+              418.32085506857925,
+              444.3551422406722
+            ],
+            "median": 444.3551422406722,
+            "minimum": 418.32085506857925,
+            "maximum": 463.8626697582462
+          },
+          "F_relative_H_percent": 163.71376660292665
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              262144,
+              262144,
+              262144
+            ],
+            "median": 262144,
+            "minimum": 262144,
+            "maximum": 262144
+          },
+          "F": {
+            "raw": [
+              262144,
+              262144,
+              262144
+            ],
+            "median": 262144,
+            "minimum": 262144,
+            "maximum": 262144
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "context_131072_c1",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          100.46967711210003,
+          100.84300555514969,
+          98.34583502480835
+        ],
+        "median": 100.46967711210003,
+        "minimum": 98.34583502480835,
+        "maximum": 100.84300555514969,
+        "arithmetic_mean": 99.88617256401936
+      },
+      "F": {
+        "raw": [
+          147.3413482543478,
+          148.97478342927184,
+          144.31329341276052
+        ],
+        "median": 147.3413482543478,
+        "minimum": 144.31329341276052,
+        "maximum": 148.97478342927184,
+        "arithmetic_mean": 146.8764750321267
+      },
+      "F_relative_H_percent": 46.65255477028183,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              217746.93894851953,
+              217978.4865733236,
+              218005.09785488248
+            ],
+            "median": 217978.4865733236,
+            "minimum": 217746.93894851953,
+            "maximum": 218005.09785488248
+          },
+          "F": {
+            "raw": [
+              106494.41302288324,
+              106287.72693127394,
+              106508.92692338675
+            ],
+            "median": 106494.41302288324,
+            "minimum": 106287.72693127394,
+            "maximum": 106508.92692338675
+          },
+          "F_relative_H_percent": -51.14453050069203
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              9.953251854131473,
+              9.916404162042884,
+              10.168198782874168
+            ],
+            "median": 9.953251854131473,
+            "minimum": 9.916404162042884,
+            "maximum": 10.168198782874168
+          },
+          "F": {
+            "raw": [
+              6.786961106625354,
+              6.7125454186329865,
+              6.929368572719286
+            ],
+            "median": 6.786961106625354,
+            "minimum": 6.7125454186329865,
+            "maximum": 6.929368572719286
+          },
+          "F_relative_H_percent": -31.811620904496962
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              4.492480905755065,
+              4.488637484978894,
+              4.483081151511245
+            ],
+            "median": 4.488637484978894,
+            "minimum": 4.483081151511245,
+            "maximum": 4.492480905755065
+          },
+          "F": {
+            "raw": [
+              9.026383783672113,
+              9.048778038988896,
+              9.01364187135502
+            ],
+            "median": 9.026383783672113,
+            "minimum": 9.01364187135502,
+            "maximum": 9.048778038988896
+          },
+          "F_relative_H_percent": 101.09406950057043
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              101.86803103407915,
+              101.4064659307142,
+              101.27021463381062
+            ],
+            "median": 101.4064659307142,
+            "minimum": 101.27021463381062,
+            "maximum": 101.86803103407915
+          },
+          "F": {
+            "raw": [
+              147.7591597247857,
+              147.93941862340938,
+              147.5062439992549
+            ],
+            "median": 147.7591597247857,
+            "minimum": 147.5062439992549,
+            "maximum": 147.93941862340938
+          },
+          "F_relative_H_percent": 45.709801015787185
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F": {
+            "raw": [
+              1024,
+              1024,
+              1024
+            ],
+            "median": 1024,
+            "minimum": 1024,
+            "maximum": 1024
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              131072,
+              131072,
+              131072
+            ],
+            "median": 131072,
+            "minimum": 131072,
+            "maximum": 131072
+          },
+          "F": {
+            "raw": [
+              131072,
+              131072,
+              131072
+            ],
+            "median": 131072,
+            "minimum": 131072,
+            "maximum": 131072
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    },
+    {
+      "case": "context_131072_c4",
+      "metric": "upstream_ROW_decode_tps",
+      "higher_is_better": true,
+      "H": {
+        "raw": [
+          13.21701824959367,
+          13.240749474561456,
+          12.951207431322763
+        ],
+        "median": 13.21701824959367,
+        "minimum": 12.951207431322763,
+        "maximum": 13.240749474561456,
+        "arithmetic_mean": 13.136325051825963
+      },
+      "F": {
+        "raw": [
+          24.07474920217784,
+          24.056013478603735,
+          22.534774078696024
+        ],
+        "median": 24.056013478603735,
+        "minimum": 22.534774078696024,
+        "maximum": 24.07474920217784,
+        "arithmetic_mean": 23.555178919825867
+      },
+      "F_relative_H_percent": 82.0078706431633,
+      "F_numerically_better": true,
+      "additional_metrics": {
+        "mean_ttft_ms": {
+          "H": {
+            "raw": [
+              549581.7048081663,
+              548636.6288696881,
+              548603.8865409791
+            ],
+            "median": 548636.6288696881,
+            "minimum": 548603.8865409791,
+            "maximum": 549581.7048081663
+          },
+          "F": {
+            "raw": [
+              288634.12875751965,
+              288275.41891415603,
+              289023.03120074794
+            ],
+            "median": 288634.12875751965,
+            "minimum": 288275.41891415603,
+            "maximum": 289023.03120074794
+          },
+          "F_relative_H_percent": -47.39065648019724
+        },
+        "mean_tpot_ms": {
+          "H": {
+            "raw": [
+              302.64012082475347,
+              302.09770282905254,
+              308.851512201551
+            ],
+            "median": 302.64012082475347,
+            "minimum": 302.09770282905254,
+            "maximum": 308.851512201551
+          },
+          "F": {
+            "raw": [
+              166.14918670214655,
+              166.27858990674997,
+              177.50344361257783
+            ],
+            "median": 166.27858990674997,
+            "minimum": 166.14918670214655,
+            "maximum": 177.50344361257783
+          },
+          "F_relative_H_percent": -45.0573210671446
+        },
+        "actual_aggregate_output_tps": {
+          "H": {
+            "raw": [
+              4.584266610678924,
+              4.591767732268085,
+              4.585766449235899
+            ],
+            "median": 4.585766449235899,
+            "minimum": 4.584266610678924,
+            "maximum": 4.591767732268085
+          },
+          "F": {
+            "raw": [
+              8.558152297564886,
+              8.562118618358658,
+              8.53098280997447
+            ],
+            "median": 8.558152297564886,
+            "minimum": 8.53098280997447,
+            "maximum": 8.562118618358658
+          },
+          "F_relative_H_percent": 86.62425119776617
+        },
+        "observed_C_resident_no_prefill_output_tok_s": {
+          "H": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F": {
+            "raw": [
+              null,
+              null,
+              null
+            ],
+            "median": null,
+            "minimum": null,
+            "maximum": null,
+            "reason": "Missing or undefined in at least one formal repeat. Single-output-token TPOT and insufficient eligible common-generation samples remain unavailable; no partial-repeat median is substituted."
+          },
+          "F_relative_H_percent": null
+        },
+        "total_output_tokens": {
+          "H": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F": {
+            "raw": [
+              4096,
+              4096,
+              4096
+            ],
+            "median": 4096,
+            "minimum": 4096,
+            "maximum": 4096
+          },
+          "F_relative_H_percent": 0.0
+        },
+        "total_input_tokens": {
+          "H": {
+            "raw": [
+              524288,
+              524288,
+              524288
+            ],
+            "median": 524288,
+            "minimum": 524288,
+            "maximum": 524288
+          },
+          "F": {
+            "raw": [
+              524288,
+              524288,
+              524288
+            ],
+            "median": 524288,
+            "minimum": 524288,
+            "maximum": 524288
+          },
+          "F_relative_H_percent": 0.0
+        }
+      }
+    }
+  ]
+}

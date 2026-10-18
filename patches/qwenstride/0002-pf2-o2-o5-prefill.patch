@@ -1,0 +1,525 @@
+--- /dev/null
++++ b/vllm/v1/attention/ops/qwen031/__init__.py
+@@ -0,0 +1 @@
++"""Qwen INT8 KV prefill extensions; derived from the frozen local release."""
+--- /dev/null
++++ b/vllm/v1/attention/ops/qwen031/dispatch.py
+@@ -0,0 +1,26 @@
++"""Opt-in, keyword-only prefill dispatch; all other calls keep 0.31 native code."""
++import functools
++import inspect
++import os
++
++
++def wrap(native):
++    parameters = inspect.signature(native).parameters
++    required = frozenset(n for n, p in parameters.items() if p.default is p.empty)
++    supported = frozenset(parameters)
++
++    @functools.wraps(native)
++    def dispatch(*args, **kwargs):
++        if (args or os.environ.get('QWEN_PF2') != '1'
++                or kwargs.get('o5_fallback_only', False)
++                or not required.issubset(kwargs) or not kwargs.keys() <= supported):
++            return native(*args, **kwargs)
++        from . import o2, o5, pf2
++        if o5.try_run(kwargs, native):
++            return
++        if o2.try_run(kwargs):
++            return
++        if pf2.try_run(kwargs):
++            return
++        return native(*args, **kwargs)
++    return dispatch
+--- /dev/null
++++ b/vllm/v1/attention/ops/qwen031/o2.py
+@@ -0,0 +1,98 @@
++"""Default-off, bulk-only O2 serving experiment; production files stay untouched."""
++import json
++import os
++from pathlib import Path
++import torch
++from . import pf2, o2_kernels
++from vllm.triton_utils import triton
++
++qc_cache={}
++logged=set()
++control_cache={'mtime':None,'data':{'enabled':False,'label':'missing'}}
++probed=False
++
++
++def control():
++    name=os.environ.get('QWEN_O2_CONTROL_FILE')
++    if not name:return {'enabled':True,'label':'static'}
++    try:
++        p=Path(name);stamp=p.stat().st_mtime_ns
++        if stamp!=control_cache['mtime']:
++            control_cache.update(mtime=stamp,data=json.loads(p.read_text()))
++        return control_cache['data']
++    except (OSError,ValueError):return {'enabled':False,'label':'missing'}
++
++
++def real_probe(q,qc,qs,dk,dv,dks,dvs,out,n,t,phase):
++    """Non-timing, synthetic-input real-model reference on verified physical GPU1."""
++    global probed
++    if probed or q.device.index!=1 or n!=32768:return
++    probed=True
++    import numpy as np
++    original=q.float().cpu().numpy()
++    codes=qc[:t].cpu().numpy();scales=qs[:t].cpu().numpy()
++    k=dk[:n].cpu().numpy();v=dv[:n].cpu().numpy()
++    sk=dks[:n].cpu().numpy();sv=dvs[:n].cpu().numpy()
++    actual=out.float().cpu().numpy()
++    mx=np.max(np.abs(original),axis=-1)
++    refscale=np.where(mx>0,mx/np.float32(127),np.float32(1)).astype(np.float32)
++    refcode=np.clip(np.rint(original/refscale[...,None]),-127,127).astype(np.int8)
++    qs_exact=bool(np.array_equal(scales,refscale));qc_exact=bool(np.array_equal(codes,refcode))
++    rows=[(0,0),(t//2,5),(t-1,6),(t-1,11)]
++    orig_rows=[];quant_rows=[];got=[]
++    for i,h in rows:
++        count=n-t+i+1;kh=h//6
++        keys=k[:count,kh].astype(np.float64)*sk[:count,kh,None].astype(np.float64)
++        values=v[:count,kh].astype(np.float64)*sv[:count,kh,None].astype(np.float64)
++        refs=[]
++        for query in [original[i,h].astype(np.float64),codes[i,h].astype(np.float64)*float(scales[i,h])]:
++            scores=keys@query*.0625;p=np.exp(scores-np.max(scores));refs.append((p@values)/p.sum())
++        orig_rows.append(refs[0]);quant_rows.append(refs[1]);got.append(actual[i,h])
++    orig_rows=np.asarray(orig_rows);quant_rows=np.asarray(quant_rows);got=np.asarray(got)
++    def diff(a,b):
++        e=a-b
++        return {'max_abs':float(np.abs(e).max()),'relative_l2':float(np.linalg.norm(e)/max(np.linalg.norm(b),1e-30))}
++    impl=diff(got,quant_rows)
++    d={'kind':'real-model synthetic-input independent FP64','device_index':q.device.index,'N':n,'T':t,
++       'phase':phase,'selected_rows':rows,'codes_exact':qc_exact,'scales_exact':qs_exact,
++       'finite_all_output':bool(np.isfinite(actual).all()),'implementation_vs_quantized_FP64':impl,
++       'quantization_only_vs_original_FP64':diff(quant_rows,orig_rows),'total_vs_original_FP64':diff(got,orig_rows),
++       'query_absmax':float(mx.max()),'query_rms':float(np.sqrt(np.mean(original.astype(np.float64)**2)))}
++    d['ok']=qc_exact and qs_exact and d['finite_all_output'] and impl['max_abs']<.005 and impl['relative_l2']<.01
++    root=Path(os.environ['QWEN_O2_PROBE_ROOT']);root.mkdir(exist_ok=True)
++    (root/'real-model-numeric.json').write_text(json.dumps(d,indent=2))
++    print('QWEN_O2_REAL_NUMERIC '+json.dumps(d),flush=True)
++
++
++def try_run(d):
++    if os.environ.get('QWEN_O2')!='1' or not pf2.eligible(d):return False
++    q=d['q'];t=q.shape[0];n=d['max_seqlen_k']
++    if not 513<=t<=2048 or not 16384<=n<=131072:return False
++    if torch.cuda.is_current_stream_capturing():return False
++    phase=control()
++    if not phase.get('enabled'):return False
++    out,k,v,ks,vs=(d[x] for x in ['out','k','v','k_scale_cache','v_scale_cache'])
++    key=(q.device.index,torch.cuda.current_stream(q.device).cuda_stream)
++    if any(k[0]==key[0] and k!=key for k in pf2.cache.keys() | qc_cache.keys()):return False
++    try:
++        if key not in pf2.cache:
++            dk=torch.empty((131072,2,256),device=q.device,dtype=torch.int8);dv=torch.empty_like(dk)
++            dks=torch.empty((131072,2),device=q.device,dtype=torch.float32);dvs=torch.empty_like(dks)
++            pf2.cache[key]=(dk,dv,dks,dvs)
++        if key not in qc_cache:
++            qc_cache[key]=(torch.empty((2048,12,256),device=q.device,dtype=torch.int8),
++                           torch.empty((2048,12),device=q.device,dtype=torch.float32))
++    except torch.OutOfMemoryError:return False
++    dk,dv,dks,dvs=pf2.cache[key];qc,qs=qc_cache[key]
++    pf2.gather[(n,2)](k,v,ks,vs,d['block_table'],dk,dv,dks,dvs,d['seqused_k'],k.shape[1],2,256,
++                     *k.stride()[:3],*ks.stride(),num_warps=4)
++    o2_kernels.quantize[(triton.cdiv(t,32),12)](q,qc,qs,t,12,*q.stride()[:2],num_warps=4)
++    o2_kernels.attention[(triton.cdiv(t,32),12)](q,qc,qs,dk,dv,dks,dvs,out,d['seqused_k'],t,12,2,
++                      *q.stride()[:2],*out.stride()[:2],False,num_warps=4,num_stages=2)
++    marker=(q.device.index,n,t,phase.get('label'))
++    if marker not in logged:
++        logged.add(marker)
++        print('QWEN_O2_HIT '+json.dumps({'pid':os.getpid(),'device':q.device.index,'q':t,'n':n,
++              'phase':phase.get('label'),'Q_scratch_bytes':2048*12*260,'route':'dense-separate-INT8-QK'}),flush=True)
++    if phase.get('probe'):real_probe(q,qc,qs,dk,dv,dks,dvs,out,n,t,phase.get('label'))
++    return True
+--- /dev/null
++++ b/vllm/v1/attention/ops/qwen031/o2_kernels.py
+@@ -0,0 +1,86 @@
++"""O2 arithmetic-only dense prototype; no serving patch or codec change.
++
++M32/B32, causal masking, FP32 online softmax, and BF16(P*sV) PV stay
++matched to the frozen production PF2. Q scale is FP32 per query/head.
++"""
++import triton
++import triton.language as tl
++
++
++@triton.jit
++def quantize_rows(x):
++    maximum = tl.max(tl.abs(x.to(tl.float32)), 1)
++    scale = tl.where(maximum > 0., tl.div_rn(maximum, 127.), 1.)
++    normalized = tl.div_rn(x.to(tl.float32), scale[:, None])
++    rounded = tl.inline_asm_elementwise(
++        "cvt.rni.s32.f32 $0, $1;", constraints="=r,f",
++        args=[normalized], dtype=tl.int32, is_pure=True, pack=1)
++    code = tl.minimum(tl.maximum(rounded, -127), 127).to(tl.int8)
++    return code, scale
++
++
++@triton.jit
++def quantize(Q, QC, QS, T: tl.constexpr, HQ: tl.constexpr,
++             Q0: tl.constexpr, Q1: tl.constexpr, M: tl.constexpr = 32):
++    qi = tl.program_id(0) * M + tl.arange(0, M)
++    head = tl.program_id(1)
++    dd = tl.arange(0, 256)
++    x = tl.load(Q + qi[:, None] * Q0 + head * Q1 + dd[None, :], qi[:, None] < T, 0)
++    code, scale = quantize_rows(x)
++    tl.store(QC + (qi[:, None] * HQ + head) * 256 + dd[None, :], code, qi[:, None] < T)
++    tl.store(QS + qi * HQ + head, scale, qi < T)
++
++
++@triton.jit
++def attention(Q, QC, QS, K, V, KS, VS, O, L,
++              T: tl.constexpr, HQ: tl.constexpr, HK: tl.constexpr,
++              Q0: tl.constexpr, Q1: tl.constexpr,
++              O0: tl.constexpr, O1: tl.constexpr,
++              INLINE: tl.constexpr, M: tl.constexpr = 32,
++              B: tl.constexpr = 32):
++    qi = tl.program_id(0) * M + tl.arange(0, M)
++    head = tl.program_id(1)
++    kh = head // (HQ // HK)
++    dd = tl.arange(0, 256)
++    kk = tl.arange(0, B)
++    n = tl.load(L)
++    if INLINE:
++        original = tl.load(Q + qi[:, None] * Q0 + head * Q1 + dd[None, :], qi[:, None] < T, 0)
++        q, sq = quantize_rows(original)
++    else:
++        q = tl.load(QC + (qi[:, None] * HQ + head) * 256 + dd[None, :], qi[:, None] < T, 0)
++        sq = tl.load(QS + qi * HQ + head, qi < T, 1.)
++    acc = tl.zeros((M, 256), tl.float32)
++    maximum = tl.full((M,), float('-inf'), tl.float32)
++    denominator = tl.zeros((M,), tl.float32)
++    end = tl.minimum(n, n - T + (tl.program_id(0) + 1) * M)
++    for block in range(0, tl.cdiv(end, B)):
++        pos = block * B + kk
++        k = tl.load(K + (pos[None, :] * HK + kh) * 256 + dd[:, None], pos[None, :] < n, 0)
++        v = tl.load(V + (pos[:, None] * HK + kh) * 256 + dd[None, :], pos[:, None] < n, 0).to(tl.bfloat16)
++        sk = tl.load(KS + pos * HK + kh, pos < n, 0.)
++        sv = tl.load(VS + pos * HK + kh, pos < n, 0.)
++        integer_dot = tl.dot(q, k, out_dtype=tl.int32)
++        score = integer_dot.to(tl.float32) * (sq[:, None] * ((0.0625 * 1.4426950408889634) * sk[None, :]))
++        mask = (pos[None, :] <= n - T + qi[:, None]) & (pos[None, :] < n) & (qi[:, None] < T)
++        score = tl.where(mask, score, float('-inf'))
++        new_max = tl.maximum(maximum, tl.max(score, 1))
++        new_max = tl.where(new_max == float('-inf'), 0., new_max)
++        p = tl.exp2(score - new_max[:, None])
++        alpha = tl.exp2(maximum - new_max)
++        denominator = denominator * alpha + tl.sum(p, 1)
++        acc = acc * alpha[:, None] + tl.dot((p * sv[None, :]).to(tl.bfloat16), v)
++        maximum = new_max
++    tl.store(O + qi[:, None] * O0 + head * O1 + dd[None, :],
++             acc / denominator[:, None], qi[:, None] < T)
++
++
++@triton.jit
++def integer_dot_test(A, B, C, ROWS: tl.constexpr = 32, COLS: tl.constexpr = 64):
++    rr = tl.arange(0, ROWS)
++    dd = tl.arange(0, 256)
++    cc = tl.arange(0, COLS)
++    a = tl.load(A + rr[:, None] * 256 + dd[None, :])
++    b = tl.load(B + cc[None, :] * 256 + dd[:, None])
++    c = tl.dot(a, b, out_dtype=tl.int32)
++    tl.store(C + rr[:, None] * COLS + cc[None, :], c)
+--- /dev/null
++++ b/vllm/v1/attention/ops/qwen031/o5.py
+@@ -0,0 +1,79 @@
++"""Conservative O5 eager dispatch; unchanged native arithmetic on fallback slices."""
++import os,json
++from pathlib import Path
++import torch
++from . import pf2, o2, o2_kernels, o5_kernels as kernels
++from vllm.triton_utils import triton
++from vllm.v1.kv_cache_interface import KVQuantMode
++scratch={};logged=set()
++LIMIT=262144;QUERY_LIMIT=2048;BUDGET=320*1024**2
++
++def eligible(d):
++ if os.environ.get('QWEN_O5')!='1' or os.environ.get('QWEN_PF2')!='1':return False
++ if os.environ.get('QWEN_O2_CONTROL_FILE'):return False
++ q,k,v,out,ks,vs=(d.get(x) for x in ['q','k','v','out','k_scale_cache','v_scale_cache'])
++ if any(x is None for x in [q,k,v,out,ks,vs]):return False
++ if q.ndim!=3 or k.ndim!=4 or q.shape[1:]!=(12,256) or v.shape!=k.shape or out.shape!=q.shape:return False
++ if q.dtype!=torch.bfloat16 or out.dtype!=q.dtype or k.dtype!=torch.int8 or v.dtype!=k.dtype:return False
++ if ks.dtype!=torch.float32 or vs.dtype!=ks.dtype or ks.stride()!=vs.stride() or k.stride()!=v.stride():return False
++ if q.stride(-1)!=1 or out.stride(-1)!=1 or k.stride(-1)!=1 or k.shape[2]!=2 or k.shape[3] not in (256,272):return False
++ if ks.shape!=k.shape[:3] or vs.shape!=ks.shape:return False
++ if not q.is_cuda or any(x.device!=q.device for x in [k,v,out,ks,vs]):return False
++ if d.get('kv_quant_mode')!=KVQuantMode.INT8_PER_TOKEN_HEAD or d.get('causal') is not True:return False
++ if d.get('softmax_scale')!=.0625 or d.get('softcap') not in [None,0,0.] or d.get('window_size') not in [None,(-1,-1)]:return False
++ if any(d.get(x) is not None for x in ['alibi_slopes','output_scale','qq_bias','sinks','mm_prefix_range','rswa_prefix_lens','rswa_window','q_descale','k_descale','v_descale']):return False
++ if d.get('chunk_lookback',-1)!=-1 or d.get('use_td',False) or d.get('use_alibi_sqrt',False) or d.get('mm_prefix_clamp_sliding_window',False):return False
++ lens,cu,bt=(d.get(x) for x in ['seqused_k','cu_seqlens_q','block_table']);n=d.get('max_seqlen_k');t=q.shape[0];mq=d.get('max_seqlen_q')
++ if any(x is None for x in [lens,cu,bt]) or lens.ndim!=1 or cu.ndim!=1 or bt.ndim!=2:return False
++ c=lens.numel()
++ if not 1<=c<=4 or cu.numel()!=c+1 or bt.shape[0]!=c:return False
++ if any(x.device!=q.device or x.dtype!=torch.int32 for x in [lens,cu,bt]) or lens.stride(0)!=1 or cu.stride(0)!=1 or bt.stride(1)!=1:return False
++ if not isinstance(n,int) or not 256<=n<=LIMIT or not isinstance(mq,int) or not 256<=mq<=QUERY_LIMIT or not 256<=t<=QUERY_LIMIT:return False
++ if mq>t or bt.shape[1]*k.shape[1]<n:return False
++ # Preserve existing C1 routes and their arithmetic/workspace exactly.
++ if c==1 and n<=131072:return False
++ return True
++
++def acquire(d):
++ q=d['q'];key=(q.device.index,torch.cuda.current_stream(q.device).cuda_stream);cap=131072 if d['max_seqlen_k']<=131072 else LIMIT
++ # Bound extra streams before allocating. Primary E2 normally uses one stream.
++ if any(k[0]==key[0] and k!=key for k in scratch.keys() | pf2.cache.keys() | o2.qc_cache.keys()):return None
++ try:
++  current=pf2.cache.get(key)
++  if current is None or current[0].shape[0]<cap:
++   # Release the old logical arena before growing on the same stream.
++   pf2.cache.pop(key,None);current=None
++   dk=torch.empty((cap,2,256),device=q.device,dtype=torch.int8);dv=torch.empty_like(dk);dks=torch.empty((cap,2),device=q.device,dtype=torch.float32);dvs=torch.empty_like(dks)
++   pf2.cache[key]=(dk,dv,dks,dvs)
++  if key not in o2.qc_cache:o2.qc_cache[key]=(torch.empty((QUERY_LIMIT,12,256),device=q.device,dtype=torch.int8),torch.empty((QUERY_LIMIT,12),device=q.device,dtype=torch.float32))
++  if key not in scratch:scratch[key]=torch.empty((4,3),device=q.device,dtype=torch.int32)
++ except torch.OutOfMemoryError:return None
++ total=sum(x.numel()*x.element_size() for x in pf2.cache[key]+o2.qc_cache[key]) + scratch[key].numel()*scratch[key].element_size()
++ assert total<=BUDGET,(total,BUDGET)
++ return key,total
++
++def try_run(d,native):
++ if not eligible(d) or torch.cuda.is_current_stream_capturing():return False
++ arena=acquire(d)
++ if arena is None:return False
++ key,total=arena;q,k,v,out,ks,vs=(d[x] for x in ['q','k','v','out','k_scale_cache','v_scale_cache']);lens,cu,bt=(d[x] for x in ['seqused_k','cu_seqlens_q','block_table']);n=d['max_seqlen_k'];c=lens.numel();mq=d['max_seqlen_q'];t=q.shape[0]
++ # Original metadata, query offsets and native arithmetic for every decode/
++ # unsupported slice. The native kernel early-returns on optimized slices.
++ args=dict(d);args['o5_fallback_only']=True;native(**args)
++ use_int8=os.environ.get('QWEN_O2')=='1'
++ dk,dv,dks,dvs=pf2.cache[key];qc,qs=o2.qc_cache[key]
++ if use_int8:o2_kernels.quantize[(triton.cdiv(t,32),12)](q,qc,qs,t,12,*q.stride()[:2],num_warps=4)
++ for seq in range(c):
++  kernels.gather_sequence[(triton.cdiv(n,32),2)](k,v,ks,vs,bt,dk,dv,dks,dvs,lens,cu,scratch[key],seq,use_int8,k.shape[1],bt.stride(0),*k.stride()[:3],*ks.stride(),num_warps=4)
++  kernels.attention_bf16[(triton.cdiv(mq,32),12)](q,dk,dv,dks,dvs,out,lens,cu,seq,use_int8,12,2,256,*q.stride()[:2],*out.stride()[:2],num_warps=4,num_stages=2)
++  if use_int8:kernels.attention_int8[(triton.cdiv(mq,32),12)](q,qc,qs,dk,dv,dks,dvs,out,lens,cu,seq,use_int8,12,2,*q.stride()[:2],*out.stride()[:2],False,num_warps=4,num_stages=2)
++ marker=(q.device.index,c,n>131072,mq>=513)
++ if marker not in logged:
++  logged.add(marker);record={'pid':os.getpid(),'device':q.device.index,'requests':c,'total_query_tokens':t,'max_query_tokens':mq,'max_context_tokens':n,'arena_bytes':total,'GPU_lengths_no_CPU_sync':True}
++  # Optional audit performs an explicit readback, separately from timed runs.
++  trace=os.environ.get('QWEN_O5_TRACE_DIR')
++  if trace:
++   record['actual_sequence_N_T_route']=scratch[key][:c].cpu().tolist();p=Path(trace);p.mkdir(parents=True,exist_ok=True)
++   with (p/('dispatch-'+str(os.getpid())+'.jsonl')).open('a') as f:f.write(json.dumps(record)+'\n')
++  print('QWEN_O5_DISPATCH '+json.dumps(record),flush=True)
++ return True
+--- /dev/null
++++ b/vllm/v1/attention/ops/qwen031/o5_kernels.py
+@@ -0,0 +1,90 @@
++import triton
++import triton.language as tl
++from .o2_kernels import quantize_rows
++
++@triton.jit
++def gather_sequence(K,V,KS,VS,BT,DK,DV,DKS,DVS,L,CU,STATS,SEQ:tl.constexpr,USE_INT8:tl.constexpr,PAGE:tl.constexpr,BT0:tl.constexpr,S0:tl.constexpr,S1:tl.constexpr,S2:tl.constexpr,T0:tl.constexpr,T1:tl.constexpr,T2:tl.constexpr,BLOCK:tl.constexpr=32):
++ n=tl.load(L+SEQ);t=tl.load(CU+SEQ+1)-tl.load(CU+SEQ)
++ active=(t>=256)&(t<=2048)&(n>=t)&(n<=262144)
++ if (tl.program_id(0)==0)&(tl.program_id(1)==0):
++  route=tl.where(active,tl.where(USE_INT8&(t>=513)&(n>=16384)&(n<=131072),2,1),0)
++  tl.store(STATS+SEQ*3,n);tl.store(STATS+SEQ*3+1,t);tl.store(STATS+SEQ*3+2,route)
++ if not active:return
++ x=tl.program_id(0)*BLOCK+tl.arange(0,BLOCK);h=tl.program_id(1);d=tl.arange(0,256)
++ block=tl.load(BT+SEQ*BT0+x//PAGE,x<n,0);slot=x%PAGE
++ src=block[:,None].to(tl.int64)*S0+slot[:,None]*S1+h*S2+d[None,:];dst=(x[:,None]*2+h)*256+d[None,:]
++ tl.store(DK+dst,tl.load(K+src,x[:,None]<n,0),x[:,None]<n);tl.store(DV+dst,tl.load(V+src,x[:,None]<n,0),x[:,None]<n)
++ si=block.to(tl.int64)*T0+slot*T1+h*T2
++ tl.store(DKS+x*2+h,tl.load(KS+si,x<n,0),x<n);tl.store(DVS+x*2+h,tl.load(VS+si,x<n,0),x<n)
++
++@triton.jit
++def attention_bf16(Q,K,V,KS,VS,O,L,CU,SEQ:tl.constexpr,USE_INT8:tl.constexpr,HQ:tl.constexpr,HK:tl.constexpr,D:tl.constexpr,QS0:tl.constexpr,QS1:tl.constexpr,OS0:tl.constexpr,OS1:tl.constexpr,M:tl.constexpr=32,B:tl.constexpr=32):
++ qstart=tl.load(CU+SEQ);T=tl.load(CU+SEQ+1)-qstart;n=tl.load(L+SEQ)
++ if (T<256) | (T>2048) | (n<T) | (n>262144):return
++ if USE_INT8:
++  if (T>=513) & (n>=16384) & (n<=131072):return
++ Q+=qstart*QS0;O+=qstart*OS0;L+=SEQ
++ # 20260929-pf2-tile-v1: query tile 16->32 (+2-stage pipelining at launch) halves K/V re-reads;
++ # exp -> exp2 with log2(e) folded into the scale. Same guards/gather as 3fd70d66.
++ n=tl.load(L);qi=tl.program_id(0)*M+tl.arange(0,M);h=tl.program_id(1);kh=h//(HQ//HK)
++ ds=tl.arange(0,D);ns=tl.arange(0,B)
++ q=tl.load(Q+qi[:,None]*QS0+h*QS1+ds[None,:],qi[:,None]<T,0)
++ acc=tl.zeros((M,D),tl.float32);mx=tl.full((M,),float('-inf'),tl.float32);den=tl.zeros((M,),tl.float32)
++ end=tl.minimum(n,n-T+(tl.program_id(0)+1)*M)
++ for start in range(0,tl.cdiv(end,B)):
++  pos=start*B+ns
++  k=tl.load(K+(pos[None,:]*HK+kh)*D+ds[:,None],pos[None,:]<n,0).to(q.dtype)
++  v=tl.load(V+(pos[:,None]*HK+kh)*D+ds[None,:],pos[:,None]<n,0).to(q.dtype)
++  ks=tl.load(KS+pos*HK+kh,pos<n,0);vs=tl.load(VS+pos*HK+kh,pos<n,0)
++  score=tl.dot(q,k)*((.0625*1.4426950408889634)*ks[None,:])
++  score=tl.where((pos[None,:]<=n-T+qi[:,None])&(pos[None,:]<n)&(qi[:,None]<T),score,float('-inf'))
++  new=tl.maximum(mx,tl.max(score,1));new=tl.where(new==float('-inf'),0.,new)
++  p=tl.exp2(score-new[:,None]);alpha=tl.exp2(mx-new);den=den*alpha+tl.sum(p,1)
++  acc=acc*alpha[:,None]+tl.dot((p*vs[None,:]).to(q.dtype),v);mx=new
++ tl.store(O+qi[:,None]*OS0+h*OS1+ds[None,:],acc/den[:,None],qi[:,None]<T)
++
++@triton.jit
++def attention_int8(Q, QC, QS, K, V, KS, VS, O, L, CU, SEQ: tl.constexpr, USE_INT8: tl.constexpr,
++              HQ: tl.constexpr, HK: tl.constexpr,
++              Q0: tl.constexpr, Q1: tl.constexpr,
++              O0: tl.constexpr, O1: tl.constexpr,
++              INLINE: tl.constexpr, M: tl.constexpr = 32,
++              B: tl.constexpr = 32):
++    qstart=tl.load(CU+SEQ);T=tl.load(CU+SEQ+1)-qstart;n=tl.load(L+SEQ)
++    if (not USE_INT8) | (T<513) | (T>2048) | (n<16384) | (n>131072) | (n<T):return
++    Q+=qstart*Q0;O+=qstart*O0;QC+=qstart*HQ*256;QS+=qstart*HQ;L+=SEQ
++    qi = tl.program_id(0) * M + tl.arange(0, M)
++    head = tl.program_id(1)
++    kh = head // (HQ // HK)
++    dd = tl.arange(0, 256)
++    kk = tl.arange(0, B)
++    n = tl.load(L)
++    if INLINE:
++        original = tl.load(Q + qi[:, None] * Q0 + head * Q1 + dd[None, :], qi[:, None] < T, 0)
++        q, sq = quantize_rows(original)
++    else:
++        q = tl.load(QC + (qi[:, None] * HQ + head) * 256 + dd[None, :], qi[:, None] < T, 0)
++        sq = tl.load(QS + qi * HQ + head, qi < T, 1.)
++    acc = tl.zeros((M, 256), tl.float32)
++    maximum = tl.full((M,), float('-inf'), tl.float32)
++    denominator = tl.zeros((M,), tl.float32)
++    end = tl.minimum(n, n - T + (tl.program_id(0) + 1) * M)
++    for block in range(0, tl.cdiv(end, B)):
++        pos = block * B + kk
++        k = tl.load(K + (pos[None, :] * HK + kh) * 256 + dd[:, None], pos[None, :] < n, 0)
++        v = tl.load(V + (pos[:, None] * HK + kh) * 256 + dd[None, :], pos[:, None] < n, 0).to(tl.bfloat16)
++        sk = tl.load(KS + pos * HK + kh, pos < n, 0.)
++        sv = tl.load(VS + pos * HK + kh, pos < n, 0.)
++        integer_dot = tl.dot(q, k, out_dtype=tl.int32)
++        score = integer_dot.to(tl.float32) * (sq[:, None] * ((0.0625 * 1.4426950408889634) * sk[None, :]))
++        mask = (pos[None, :] <= n - T + qi[:, None]) & (pos[None, :] < n) & (qi[:, None] < T)
++        score = tl.where(mask, score, float('-inf'))
++        new_max = tl.maximum(maximum, tl.max(score, 1))
++        new_max = tl.where(new_max == float('-inf'), 0., new_max)
++        p = tl.exp2(score - new_max[:, None])
++        alpha = tl.exp2(maximum - new_max)
++        denominator = denominator * alpha + tl.sum(p, 1)
++        acc = acc * alpha[:, None] + tl.dot((p * sv[None, :]).to(tl.bfloat16), v)
++        maximum = new_max
++    tl.store(O + qi[:, None] * O0 + head * O1 + dd[None, :],
++             acc / denominator[:, None], qi[:, None] < T)
+--- /dev/null
++++ b/vllm/v1/attention/ops/qwen031/pf2.py
+@@ -0,0 +1,79 @@
++"""Conservative C1 prefill overlay; all unsupported calls retain vLLM path."""
++import os,json
++import torch
++from vllm.triton_utils import triton,tl
++from vllm.v1.kv_cache_interface import KVQuantMode
++cache={};logged=set()
++
++@triton.jit
++def gather(K,V,KS,VS,BT,DK,DV,DKS,DVS,L,PAGE:tl.constexpr,H:tl.constexpr,D:tl.constexpr,S0:tl.constexpr,S1:tl.constexpr,S2:tl.constexpr,T0:tl.constexpr,T1:tl.constexpr,T2:tl.constexpr):
++ t=tl.program_id(0);h=tl.program_id(1);d=tl.arange(0,D);n=tl.load(L)
++ block=tl.load(BT+t//PAGE,t<n,0);slot=t%PAGE
++ src=block*S0+slot*S1+h*S2+d;dst=(t*H+h)*D+d
++ tl.store(DK+dst,tl.load(K+src,t<n,0));tl.store(DV+dst,tl.load(V+src,t<n,0))
++ si=block*T0+slot*T1+h*T2
++ tl.store(DKS+t*H+h,tl.load(KS+si,t<n,0));tl.store(DVS+t*H+h,tl.load(VS+si,t<n,0))
++
++@triton.jit
++def attention(Q,K,V,KS,VS,O,L,T:tl.constexpr,HQ:tl.constexpr,HK:tl.constexpr,D:tl.constexpr,QS0:tl.constexpr,QS1:tl.constexpr,OS0:tl.constexpr,OS1:tl.constexpr,M:tl.constexpr=32,B:tl.constexpr=32):
++ # 20260929-pf2-tile-v1: query tile 16->32 (+2-stage pipelining at launch) halves K/V re-reads;
++ # exp -> exp2 with log2(e) folded into the scale. Same guards/gather as 3fd70d66.
++ n=tl.load(L);qi=tl.program_id(0)*M+tl.arange(0,M);h=tl.program_id(1);kh=h//(HQ//HK)
++ ds=tl.arange(0,D);ns=tl.arange(0,B)
++ q=tl.load(Q+qi[:,None]*QS0+h*QS1+ds[None,:],qi[:,None]<T,0)
++ acc=tl.zeros((M,D),tl.float32);mx=tl.full((M,),float('-inf'),tl.float32);den=tl.zeros((M,),tl.float32)
++ end=tl.minimum(n,n-T+(tl.program_id(0)+1)*M)
++ for start in range(0,tl.cdiv(end,B)):
++  pos=start*B+ns
++  k=tl.load(K+(pos[None,:]*HK+kh)*D+ds[:,None],pos[None,:]<n,0).to(q.dtype)
++  v=tl.load(V+(pos[:,None]*HK+kh)*D+ds[None,:],pos[:,None]<n,0).to(q.dtype)
++  ks=tl.load(KS+pos*HK+kh,pos<n,0);vs=tl.load(VS+pos*HK+kh,pos<n,0)
++  score=tl.dot(q,k)*((.0625*1.4426950408889634)*ks[None,:])
++  score=tl.where((pos[None,:]<=n-T+qi[:,None])&(pos[None,:]<n)&(qi[:,None]<T),score,float('-inf'))
++  new=tl.maximum(mx,tl.max(score,1));new=tl.where(new==float('-inf'),0.,new)
++  p=tl.exp2(score-new[:,None]);alpha=tl.exp2(mx-new);den=den*alpha+tl.sum(p,1)
++  acc=acc*alpha[:,None]+tl.dot((p*vs[None,:]).to(q.dtype),v);mx=new
++ tl.store(O+qi[:,None]*OS0+h*OS1+ds[None,:],acc/den[:,None],qi[:,None]<T)
++
++def eligible(d):
++ q=d.get('q');k=d.get('k');v=d.get('v');out=d.get('out');ks=d.get('k_scale_cache');vs=d.get('v_scale_cache')
++ if any(x is None for x in [q,k,v,out,ks,vs]):return False
++ if not q.is_cuda or any(x.device!=q.device for x in [k,v,out,ks,vs]):return False
++ if q.ndim!=3 or k.ndim!=4 or v.shape!=k.shape or q.shape[1:]!=(12,256):return False
++ if q.dtype!=torch.bfloat16 or k.dtype!=torch.int8 or v.dtype!=torch.int8 or out.dtype!=q.dtype:return False
++ if ks.dtype!=torch.float32 or vs.dtype!=torch.float32 or ks.stride()!=vs.stride() or k.stride()!=v.stride():return False
++ if q.stride(-1)!=1 or k.stride(-1)!=1 or out.stride(-1)!=1 or out.shape!=q.shape or k.shape[2]!=2 or k.shape[3] not in (256,272):return False
++ if d.get('kv_quant_mode')!=KVQuantMode.INT8_PER_TOKEN_HEAD or d.get('causal') is not True:return False
++ if d.get('softmax_scale')!=.0625 or d.get('softcap') not in [None,0,0.] or d.get('window_size') not in [None,(-1,-1)]:return False
++ if any(d.get(x) is not None for x in ['alibi_slopes','output_scale','qq_bias','sinks','mm_prefix_range','rswa_prefix_lens','rswa_window','q_descale','k_descale','v_descale']):return False
++ if d.get('mm_prefix_clamp_sliding_window',False):return False
++ if d.get('chunk_lookback',-1)!=-1 or d.get('use_td',False) or d.get('use_alibi_sqrt',False):return False
++ lens=d.get('seqused_k');cu=d.get('cu_seqlens_q');bt=d.get('block_table');n=d.get('max_seqlen_k');t=q.shape[0]
++ if lens is None or lens.numel()!=1 or cu is None or cu.numel()!=2 or bt is None or bt.shape[0]!=1:return False
++ if not isinstance(n,int) or not 32<=t<=2048 or d.get('max_seqlen_q')!=t or not t<=n<=131072:return False
++ if any(x.device!=q.device or x.dtype!=torch.int32 for x in [lens,cu,bt]):return False
++ if lens.ndim!=1 or cu.ndim!=1 or bt.ndim!=2 or lens.stride(0)!=1 or cu.stride(0)!=1 or bt.stride(1)!=1:return False
++ if ks.shape!=k.shape[:3] or vs.shape!=ks.shape:return False
++ if bt.shape[1]*k.shape[1]<n:return False
++ return True
++
++def try_run(d):
++ if os.environ.get('QWEN_PF2')!='1' or not eligible(d):return False
++ if torch.cuda.is_current_stream_capturing():return False
++ q,k,v,out,ks,vs=(d[x] for x in ['q','k','v','out','k_scale_cache','v_scale_cache']);n=d['max_seqlen_k'];t=q.shape[0]
++ # One fixed bounded 130MiB workspace per device/stream; reused sequentially across layers.
++ key=(q.device.index,torch.cuda.current_stream(q.device).cuda_stream)
++ if any(k[0]==key[0] and k!=key for k in cache):return False
++ if key not in cache:
++  try:
++   dk=torch.empty((131072,2,256),device=q.device,dtype=torch.int8);dv=torch.empty_like(dk)
++   dks=torch.empty((131072,2),device=q.device,dtype=torch.float32);dvs=torch.empty_like(dks)
++   cache[key]=(dk,dv,dks,dvs)
++  except torch.OutOfMemoryError:return False
++ dk,dv,dks,dvs=cache[key]
++ gather[(n,2)](k,v,ks,vs,d['block_table'],dk,dv,dks,dvs,d['seqused_k'],k.shape[1],2,256,*k.stride()[:3],*ks.stride(),num_warps=4)
++ attention[(triton.cdiv(t,32),12)](q,dk,dv,dks,dvs,out,d['seqused_k'],t,12,2,256,*q.stride()[:2],*out.stride()[:2],num_warps=4,num_stages=2)
++ logkey=(key, 'long' if n>65536 else 'short')
++ if logkey not in logged:
++  logged.add(logkey);print('QWEN_PF2_HIT '+json.dumps({'pid':os.getpid(),'device':q.device.index,'q':t,'n':n,'workspace_bytes':136314880}),flush=True)
++ return True
+--- a/vllm/v1/attention/ops/triton_unified_attention.py
++++ b/vllm/v1/attention/ops/triton_unified_attention.py
+@@ -289,6 +289,7 @@
+     # instead of letting them override it. Default False preserves the
+     # original (causal AND SW) OR mm_prefix behavior for all other models.
+     MM_PREFIX_CLAMP_SW: tl.constexpr = False,
++    O5_FALLBACK_ONLY: tl.constexpr = False,
+ ):
+     # Per-(token, head) scale caches: used iff KV_QUANT_MODE in {2, 3}.
+     USE_PER_TOKEN_HEAD_SCALES: tl.constexpr = (KV_QUANT_MODE >= 2) and (
+@@ -318,6 +319,10 @@
+ 
+     if q_block_local_idx * BLOCK_Q >= cur_batch_query_len:
+         return
++    if O5_FALLBACK_ONLY:
++        if ((cur_batch_query_len >= 256) & (cur_batch_query_len <= 2048)
++                & (seq_len >= cur_batch_query_len) & (seq_len <= 262144)):
++            return
+ 
+     if IS_3D:
+         tiles_per_segment = cdiv_fn(seq_len, NUM_SEGMENTS_PER_SEQ * TILE_SIZE)
+@@ -875,6 +880,7 @@
+     # Gemma4: clamp mm_prefix bidirectional ranges by the sliding window.
+     # Default False keeps the original behavior for every other model.
+     mm_prefix_clamp_sliding_window: bool = False,
++    o5_fallback_only: bool = False,
+ ):
+     # Resolve causal: bool or per-seq tensor.
+     use_per_seq_causal = isinstance(causal, torch.Tensor)
+@@ -1192,6 +1198,7 @@
+         USE_TD=use_td,
+         USE_TD_QO=use_td_qo,
+         MM_PREFIX_CLAMP_SW=mm_prefix_clamp_sliding_window,
++        O5_FALLBACK_ONLY=o5_fallback_only,
+         **launch_kwargs,
+     )
+ 
+@@ -1216,3 +1223,7 @@
+             NUM_SEGMENTS_PER_SEQ=num_par_softmax_segments,
+             USE_FP8=output_scale is not None,
+         )
++
++
++from vllm.v1.attention.ops.qwen031.dispatch import wrap as _qwen031_wrap
++unified_attention = _qwen031_wrap(unified_attention)

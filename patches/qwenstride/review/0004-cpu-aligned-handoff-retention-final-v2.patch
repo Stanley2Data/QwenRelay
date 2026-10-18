@@ -1,0 +1,23 @@
+--- a/vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py
++++ b/vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py
+@@ -1324,6 +1324,20 @@
+                 ):
+                     continue
+ 
++                if _qwen031_os.environ.get("QWEN_O4") == "1":
++                    from vllm.v1.kv_offload.cpu.qwen_o4 import store_reachable
++
++                    # CoW hand-offs bypass the ordinary store loop. Apply the
++                    # same CPU retention policy before reserving a pool slot;
++                    # GPU checkpoints remain dense for local prefix hits.
++                    if not store_reachable(
++                        req,
++                        group_config,
++                        boundary // group_config.tokens_per_chunk - 1,
++                        retention_interval=self.config.retention_interval,
++                    ):
++                        continue
++
+                 key = self._make_boundary_key(
+                     req, group_idx, boundary, req_status.req_context
+                 )

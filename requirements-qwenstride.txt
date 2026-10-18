@@ -1,0 +1,17 @@
+# Pinned direct dependencies for the verified TP2 source ABI.
+# vLLM supplies the CUDA/native dependencies. See docs/qwenstride-install.md.
+vllm==0.31.0
+torch==2.13.0
+triton==3.7.1
+transformers==5.15.0
+tokenizers==0.22.2
+compressed-tensors==0.17.0
+huggingface_hub==1.32.0
+hf_transfer==0.1.9
+ninja==1.13.0
+pandas==3.0.5
+pyarrow==20.0.0
+nvidia-cuda-nvcc==13.0.88
+nvidia-cuda-crt==13.0.88
+nvidia-cuda-cccl==13.0.85
+nvidia-nvvm==13.0.88

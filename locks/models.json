@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "models": {
+    "primary": {
+      "repository": "nerkyor/Qwen3.8-27B-EfficientThink-Uncensored-K3-Opus5-Grok4.6-GPT5.6Sol-SFT-SimPO-DFlash2",
+      "revision": "882e1af3b8f5844f3b3163b132e343c06e91908f",
+      "directory": "Qwen3.8-27B-EfficientThink-AWQ-W4A16",
+      "files": [
+        {
+          "path": "config.json",
+          "bytes": 40819,
+          "sha256": "6995bb1fe060df1ecd7b4f7a3b895868d8d0132db9cae002079a8743a3ae60ea",
+          "remote_path": "NVFP4/AWQ-W4A16/config.json"
+        },
+        {
+          "path": "generation_config.json",
+          "bytes": 214,
+          "sha256": "b8eb74d15e0a56623d00ccd14950a4bb87fabbf84b5cc030dcc904b899fb1eb5",
+          "remote_path": "NVFP4/AWQ-W4A16/generation_config.json"
+        },
+        {
+          "path": "tokenizer.json",
+          "bytes": 12809320,
+          "sha256": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3",
+          "remote_path": "NVFP4/AWQ-W4A16/tokenizer.json"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "bytes": 17928,
+          "sha256": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+          "remote_path": "NVFP4/AWQ-W4A16/tokenizer_config.json"
+        },
+        {
+          "path": "vocab.json",
+          "bytes": 6722759,
+          "sha256": "ce99b4cb2983d118806ce0a8b777a35b093e2000a503ebde25853284c9dfa003",
+          "remote_path": "NVFP4/AWQ-W4A16/vocab.json"
+        },
+        {
+          "path": "merges.txt",
+          "bytes": 3353259,
+          "sha256": "a9d356d7bdf1ef4949e3e748e95b8e10ad9d4e2e838eddc38a0a7b6b94d1db8d",
+          "remote_path": "NVFP4/AWQ-W4A16/merges.txt"
+        },
+        {
+          "path": "preprocessor_config.json",
+          "bytes": 390,
+          "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+          "remote_path": "NVFP4/AWQ-W4A16/preprocessor_config.json"
+        },
+        {
+          "path": "video_preprocessor_config.json",
+          "bytes": 385,
+          "sha256": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+          "remote_path": "NVFP4/AWQ-W4A16/video_preprocessor_config.json"
+        },
+        {
+          "path": "Qwen3.8-27B-EfficientThink-SimPO-AWQ-W4A16.safetensors",
+          "bytes": 18978607760,
+          "sha256": "d5fddaac01647e5483c14dee58891c5f2e2a59d39cc7cd47e4054afcf5e2be64",
+          "remote_path": "NVFP4/AWQ-W4A16/Qwen3.8-27B-EfficientThink-SimPO-AWQ-W4A16.safetensors"
+        },
+        {
+          "path": "vision-mtp-bf16.safetensors",
+          "bytes": 1770897648,
+          "sha256": "bf23280788e616231c29db327f7df25254673c0e8c33c717bf321e310ec5ef64",
+          "remote_path": "NVFP4/AWQ-W4A16/vision-mtp-bf16.safetensors"
+        },
+        {
+          "path": "model.safetensors.index.json",
+          "bytes": 280949,
+          "sha256": "62f1523485f88b46b4497b39cf60566fcab175426c2ed99eb65b8fd97b15b251",
+          "bundled": "assets/primary/model.safetensors.index.json"
+        }
+      ]
+    },
+    "draft": {
+      "repository": "syvai/Qwen3.8-27B-DFlash2-W4A16",
+      "revision": "4d30ec736ffc6b8688dc2ae2b502d9b48bdec279",
+      "directory": "Qwen3.8-27B-DFlash2-W4A16",
+      "files": [
+        {
+          "path": "config.json",
+          "bytes": 2264,
+          "sha256": "61d6276fe8d76295232cb02d26cbb0d29c25565911f50441e779c88c9220c556",
+          "remote_path": "config.json"
+        },
+        {
+          "path": "model.safetensors",
+          "bytes": 1280633960,
+          "sha256": "ec26996e6a0745ab5edb857117220ce1e219ad524f71e6e149b703804947d8e7",
+          "remote_path": "model.safetensors"
+        }
+      ]
+    }
+  },
+  "chat_template_sha256": "cdff39fb26b60dc90faa292e726655c6b21f62db497846e02e4c4bbab942a84a",
+  "precision": "primary mixed AWQ: 367 W4 asymmetric +33 W8 symmetric targets, BF16 activations; draft W4A16 GPTQ; INT8 KV is separate"
+}

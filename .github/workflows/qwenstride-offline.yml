@@ -1,0 +1,21 @@
+name: QwenStride offline source checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/qwenstride.py check-pack
+      - run: python -m unittest discover -s tests -v
+      - name: Reconstruct pinned source without GPU or model
+        run: |
+          git init /tmp/vllm-pristine
+          git -C /tmp/vllm-pristine fetch --depth=1 https://github.com/vllm-project/vllm.git db9527a46873454610df6dbedf79a36d6bf1a7f6
+          git -C /tmp/vllm-pristine checkout --detach FETCH_HEAD
+          python scripts/qwenstride.py rebuild --vllm-source /tmp/vllm-pristine --target /tmp/final-F
+      - run: bash -n scripts/install-qwenstride.sh && bash -n scripts/start-qwenstride.sh

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "source_lock_sha256": "e5f059661dcf108b057c7bd6a89f7b8ca2a73e7fb3da79cb5f89e37273bc5634",
+  "checks": [
+    {
+      "name": "source_reconstruction_and_only_LF_delta",
+      "passed": true
+    },
+    {
+      "name": "CPU_guards_and_plans",
+      "passed": true
+    },
+    {
+      "name": "recorded_TP2_profile_parity",
+      "passed": true
+    },
+    {
+      "name": "syntax_and_static_container_review",
+      "passed": true
+    },
+    {
+      "name": "model_metadata_identity",
+      "passed": true
+    },
+    {
+      "name": "public_performance_export",
+      "passed": true
+    },
+    {
+      "name": "source_export_and_staged_Git_bytes",
+      "passed": true
+    },
+    {
+      "name": "documentation_links",
+      "passed": true
+    }
+  ],
+  "boundary": "Offline checks only. Fresh Docker build, clean native imports and new GPU/model runs were not executed."
+}

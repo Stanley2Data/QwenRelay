@@ -3,7 +3,7 @@ api_key.txt
 bench/quality-data/
 bench/results/
 bench/results-prefill-ab/
-models/
+/models/
 profiles/
 qwen.log
 venv/
@@ -12,6 +12,15 @@ drafter/runs/
 .env
 # local reproduction artifacts (symlinks here, so no trailing slash)
 venv
-models
+/models
 api_key.txt
 bench/results/
+
+# QwenStride local build and run state
+.venv/
+.build/
+.cache/
+*.verification.json
+*.partial
+.env.*
+!.env.example

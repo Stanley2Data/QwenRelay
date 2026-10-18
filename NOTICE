@@ -1,0 +1,15 @@
+QwenStride
+Derivative source distribution based on HyperQwen and vLLM.
+
+HyperQwen: https://github.com/syv-ai/HyperQwen
+Copyright and attribution of upstream authors are retained in source and Git history.
+vLLM: https://github.com/vllm-project/vllm
+Copyright contributors to the vLLM project.
+KVarN: https://github.com/huawei-csl/KVarN
+Copyright of the original KVarN authors is retained in kvarn/ source files.
+
+QwenStride modifications include aligned INT8 KV storage, hybrid CPU cache
+allocation/restoration, bounded prefill ports, fixed decode CUDA Graph coverage,
+and the source-distribution/profile/install tooling documented in UPSTREAM.md.
+The original Apache License 2.0 is included as LICENSE; dependency notices are
+described in THIRD_PARTY_NOTICES.md. Model weights are not distributed here.
