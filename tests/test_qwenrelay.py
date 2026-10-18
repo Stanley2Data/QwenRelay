@@ -42,6 +42,11 @@ class PublicSourceContracts(unittest.TestCase):
         self.assertEqual(argv[argv.index('--kv-offloading-size')+1],'32')
         self.assertEqual(env['PYTORCH_CUDA_ALLOC_CONF'],'expandable_segments:False')
         self.assertEqual(env['VLLM_USE_FLASHINFER_SAMPLER'],'0')
+        # The standalone launcher must retain the legacy DFlash2 defaults;
+        # otherwise long-context verification silently uses unified attention.
+        self.assertEqual(env['VLLM_SPEC_DECODE_ATTN'],'1')
+        self.assertEqual(int(env['VLLM_SPEC_DECODE_ATTN_QMAX']),1+spec['num_speculative_tokens'])
+        self.assertEqual(env['VLLM_DFLASH2_LOOKUP'],'1')
 
     def test_reject_duplicate_or_missing_gpus(self):
         for devices in ('0','0,0','0,1,2','a,b'):
