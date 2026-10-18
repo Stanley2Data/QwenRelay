@@ -1,5 +1,5 @@
 # Pinned direct dependencies for the verified TP2 source ABI.
-# vLLM supplies the CUDA/native dependencies. See docs/qwenstride-install.md.
+# vLLM supplies the CUDA/native dependencies. See docs/qwenrelay-install.md.
 vllm==0.31.0
 torch==2.13.0
 triton==3.7.1

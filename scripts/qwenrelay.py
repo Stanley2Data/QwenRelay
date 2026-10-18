@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
-"""QwenStride source reconstruction, asset validation and TP2 launch entry."""
+"""QwenRelay source reconstruction, asset validation and TP2 launch entry."""
 from __future__ import annotations
 
 import argparse
@@ -134,7 +134,7 @@ def rebuild(source, target, bash='bash'):
         patch = posix(ROOT / row['path'])
         for dry in (True, False):
             cmd = 'cd "$1" && patch -p1 --batch --forward --fuzz=0 ' + ('--dry-run ' if dry else '') + '< "$2"'
-            logs.append(bash_run(bash, ['-c',cmd,'qwenstride',posix(target),patch]))
+            logs.append(bash_run(bash, ['-c',cmd,'qwenrelay',posix(target),patch]))
     verify_files(target, lock['base_F'], exact=True)
     for row in lock['final_overlay']:
         out = safe_path(target, row['path'])
@@ -163,7 +163,7 @@ def install_source(source):
     package = Path(dist.locate_file('vllm')).resolve()
     if not package.is_relative_to(Path(sys.prefix).resolve()):
         raise ValueError('Refusing a package outside this virtual environment')
-    marker = package/'.qwenstride-source.json'
+    marker = package/'.qwenrelay-source.json'
     if marker.exists():
         raise ValueError('Use a new venv; this one is already modified')
     native = [{'path':p.relative_to(package).as_posix(),'sha256':sha(p)} for p in package.rglob('*.so')]
@@ -189,7 +189,7 @@ def check_runtime():
             raise ValueError(f'{name}: expected {version}, got {actual}')
     import vllm
     package = Path(vllm.__file__).resolve().parent
-    marker = read_json(package/'.qwenstride-source.json')
+    marker = read_json(package/'.qwenrelay-source.json')
     if marker['source_lock_sha256'] != sha(ROOT/'locks/source.json'):
         raise ValueError('Runtime belongs to a different source lock')
     verify_files(package, [{**r,'path':r['path'][5:]} for r in source_lock()['final_F'] if r['path'].startswith('vllm/')])
@@ -238,7 +238,7 @@ def launch_plan(models_root, devices, port, host):
     draft = str(Path(models_root).resolve()/models['draft']['directory'])
     spec={**profile['speculative_config'],'model':draft}
     argv=[sys.executable,'-m','vllm.entrypoints.cli.main','serve',main,
-          '--served-model-name','qwenstride','--host',host,'--port',str(port)]
+          '--served-model-name','qwenrelay','--host',host,'--port',str(port)]
     for flag,value in profile['options'].items():
         argv.append('--'+flag)
         if value is not True:
@@ -308,4 +308,4 @@ def main():
 if __name__=='__main__':
     try:main()
     except (ValueError,OSError,RuntimeError,importlib.metadata.PackageNotFoundError) as e:
-        print('qwenstride: '+str(e),file=sys.stderr);sys.exit(1)
+        print('qwenrelay: '+str(e),file=sys.stderr);sys.exit(1)

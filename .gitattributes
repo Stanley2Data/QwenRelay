@@ -9,4 +9,4 @@ assets/** -text
 config/chat-template.jinja -text
 licenses/vllm-* -text
 # A unified diff's blank context line is a literal space.
-patches/qwenstride/** -whitespace
+patches/qwenrelay/** -whitespace

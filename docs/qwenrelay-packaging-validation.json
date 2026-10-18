@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "passed": true,
-  "source_lock_sha256": "e5f059661dcf108b057c7bd6a89f7b8ca2a73e7fb3da79cb5f89e37273bc5634",
+  "source_lock_sha256": "9b179653a1911b5eee43c4baf0da7e080827f9e2fb4bc1db9339d882509f563d",
   "checks": [
     {
       "name": "source_reconstruction_and_only_LF_delta",
@@ -36,5 +36,14 @@
       "passed": true
     }
   ],
-  "boundary": "Offline checks only. Fresh Docker build, clean native imports and new GPU/model runs were not executed."
+  "boundary": "Offline checks only. Fresh Docker build, clean native imports and new GPU/model runs were not executed.",
+  "pre_rename_source_lock_sha256": "e5f059661dcf108b057c7bd6a89f7b8ca2a73e7fb3da79cb5f89e37273bc5634",
+  "project_rename_validation": {
+    "from": "QwenStride",
+    "to": "QwenRelay",
+    "source_tree_hashes_unchanged": true,
+    "patch_bytes_unchanged": true,
+    "cpu_contract_tests_passed": 6,
+    "fresh_reconstruction_repeated": false
+  }
 }

@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
-spec=importlib.util.spec_from_file_location('qwenstride',ROOT/'scripts/qwenstride.py')
+spec=importlib.util.spec_from_file_location('qwenrelay',ROOT/'scripts/qwenrelay.py')
 q=importlib.util.module_from_spec(spec);spec.loader.exec_module(q)
 
 

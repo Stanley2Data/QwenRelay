@@ -47,9 +47,9 @@ def cases():
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--host',default='127.0.0.1');p.add_argument('--port',type=int,default=18020)
-    p.add_argument('--model',default='qwenstride')
+    p.add_argument('--model',default='qwenrelay')
     p.add_argument('--tokenizer',type=Path,default=ROOT/'models/Qwen3.8-27B-EfficientThink-AWQ-W4A16')
-    p.add_argument('--output',type=Path,default=ROOT/'bench/results/qwenstride')
+    p.add_argument('--output',type=Path,default=ROOT/'bench/results/qwenrelay')
     p.add_argument('--api-key-file',type=Path,default=ROOT/'api_key.txt')
     g=p.add_mutually_exclusive_group(required=True);g.add_argument('--plan',action='store_true');g.add_argument('--run',action='store_true')
     a=p.parse_args()

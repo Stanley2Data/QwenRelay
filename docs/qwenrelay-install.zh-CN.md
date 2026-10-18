@@ -1,6 +1,6 @@
-# 安装 QwenStride 0.1
+# 安装 QwenRelay 0.1
 
-[English](qwenstride-install.md) · [README](../README.zh-CN.md)
+[English](qwenrelay-install.md) · [README](../README.zh-CN.md)
 
 ## 准备机器
 
@@ -13,17 +13,17 @@
 系统需有 Python 3.12 的 venv/dev 支持、C/C++ 编译器、Git、GNU patch、curl 和证书。进入本仓库：
 
 ```bash
-bash scripts/install-qwenstride.sh
+bash scripts/install-qwenrelay.sh
 ```
 
-脚本只接受全新 `.venv`，按 `requirements-qwenstride.txt` 安装直接依赖，获取固定 vLLM commit `db9527a46873454610df6dbedf79a36d6bf1a7f6`，重建最终 F，再把源码覆盖到新 venv 并保持 wheel 原生扩展不变。不会下载权重、启动模型或改变已有服务。
+脚本只接受全新 `.venv`，按 `requirements-qwenrelay.txt` 安装直接依赖，获取固定 vLLM commit `db9527a46873454610df6dbedf79a36d6bf1a7f6`，重建最终 F，再把源码覆盖到新 venv 并保持 wheel 原生扩展不变。不会下载权重、启动模型或改变已有服务。
 
-可选环境变量为 `PYTHON`、`QWENSTRIDE_VENV`、`QWENSTRIDE_BUILD`、`VLLM_SOURCE`。最后一项可指定已经准备好的干净 vLLM 源码，构建输出目录必须是新的。直接依赖和源码有固定版本，传递依赖及 apt 包仍按当时解析；它不是完全封闭的依赖锁或逐字节相同的 native 构建。复现时保存 `pip freeze` 和原生文件 SHA。
+可选环境变量为 `PYTHON`、`QWENRELAY_VENV`、`QWENRELAY_BUILD`、`VLLM_SOURCE`。最后一项可指定已经准备好的干净 vLLM 源码，构建输出目录必须是新的。直接依赖和源码有固定版本，传递依赖及 apt 包仍按当时解析；它不是完全封闭的依赖锁或逐字节相同的 native 构建。复现时保存 `pip freeze` 和原生文件 SHA。
 
 ## 准备权重
 
 ```bash
-.venv/bin/python scripts/qwenstride.py fetch-models --root ./models
+.venv/bin/python scripts/qwenrelay.py fetch-models --root ./models
 ```
 
 这是显式联网下载动作，从原作者固定完整 commit 获取主模型和草稿，并验证每份文件完整 SHA256/大小。不会退回其他模型或覆盖不匹配文件。来源分别为：
@@ -36,7 +36,7 @@ bash scripts/install-qwenstride.sh
 仓库只包含测试时使用的文本模型索引与聊天模板等小型元数据。索引映射主权重和 BF16 视觉/MTP 文件，启动仍使用 language-model-only。已有完整模型可以直接检查：
 
 ```bash
-.venv/bin/python scripts/qwenstride.py check-models --root /绝对路径/models
+.venv/bin/python scripts/qwenrelay.py check-models --root /绝对路径/models
 ```
 
 其下应有 `Qwen3.8-27B-EfficientThink-AWQ-W4A16/` 与 `Qwen3.8-27B-DFlash2-W4A16/`。每次启动会完整读取并检查模型 SHA，约 21 GiB 需要一定时间。
@@ -46,11 +46,11 @@ bash scripts/install-qwenstride.sh
 ```bash
 umask 077
 .venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))' > api_key.txt
-bash scripts/start-qwenstride.sh --devices 0,1 --dry-run
-bash scripts/start-qwenstride.sh --devices 0,1
+bash scripts/start-qwenrelay.sh --devices 0,1 --dry-run
+bash scripts/start-qwenrelay.sh --devices 0,1
 ```
 
-默认 `127.0.0.1:18020/v1`、模型名 `qwenstride`。设备、模型目录、端口、绑定地址和 key 文件可用参数指定；环境变量见 `.env.example`。原生脚本不把 `.env` 当 Shell 执行，请显式 export 或传参。`--dry-run` 仅打印计划，不检查模型/运行库，也不触碰 GPU，不能代表部署成功。
+默认 `127.0.0.1:18020/v1`、模型名 `qwenrelay`。设备、模型目录、端口、绑定地址和 key 文件可用参数指定；环境变量见 `.env.example`。原生脚本不把 `.env` 当 Shell 执行，请显式 export 或传参。`--dry-run` 仅打印计划，不检查模型/运行库，也不触碰 GPU，不能代表部署成功。
 
 唯一数值配置是 `config/dual-3090.json`。`INT8_ACT` 和 Marlin INT8 输入开关会在启动环境中清除，避免继承父进程开关。32 GiB 是主机缓存总字节预算；256K 是单请求上限，不保证四条 256K 同驻留。
 
@@ -61,20 +61,20 @@ bash scripts/start-qwenstride.sh --devices 0,1
 ```bash
 docker compose build
 docker compose up -d
-docker compose logs -f qwenstride
+docker compose logs -f qwenrelay
 ```
 
 容器暴露 NVIDIA 设备，由 `CUDA_VISIBLE_DEVICES` 选择两卡（默认 `0,1`），主机端口仅发布到 loopback。权重只读挂载、key 作为 secret、编译缓存使用独立卷，`/dev/shm` 为 40 GiB。不需要 privileged 或宿主 Docker socket，也没有自动重启策略。
 
-**本轮整理没有执行全新 Docker 构建或 GPU 启动。** 以前双卡运行库验证和本次公开安装路径检查分开记录，详见[验证边界](qwenstride-validation.md)。
+**本轮整理没有执行全新 Docker 构建或 GPU 启动。** 以前双卡运行库验证和本次公开安装路径检查分开记录，详见[验证边界](qwenrelay-validation.md)。
 
 ## 离线重建
 
 不需要导入 vLLM/PyTorch；准备 Python、Bash/GNU patch 与干净 vLLM 固定源码：
 
 ```bash
-python3 scripts/qwenstride.py check-pack
-python3 scripts/qwenstride.py rebuild --vllm-source /path/to/vllm --target /新目录/final-F
+python3 scripts/qwenrelay.py check-pack
+python3 scripts/qwenrelay.py rebuild --vllm-source /path/to/vllm --target /新目录/final-F
 python3 -m unittest discover -s tests -v
 ```
 

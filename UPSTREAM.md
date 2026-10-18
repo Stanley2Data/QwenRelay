@@ -1,8 +1,8 @@
 # Upstream identity and changes
 
-QwenStride is a derivative source distribution of [syv-ai/HyperQwen](https://github.com/syv-ai/HyperQwen). It preserves the public Git history through **95ee3b64b0df7014ee2626529524d6b99c3dcdd1** (491 commits). The base vLLM is **v0.31.0**, commit **db9527a46873454610df6dbedf79a36d6bf1a7f6**. Nothing in the installer follows a moving branch.
+QwenRelay is a derivative source distribution of [syv-ai/HyperQwen](https://github.com/syv-ai/HyperQwen). It preserves the public Git history through **95ee3b64b0df7014ee2626529524d6b99c3dcdd1** (491 commits). The base vLLM is **v0.31.0**, commit **db9527a46873454610df6dbedf79a36d6bf1a7f6**. Nothing in the installer follows a moving branch.
 
-Upstream source/license/copyright notices remain in place. [README.hyperqwen.md](README.hyperqwen.md) preserves the pinned upstream README. QwenStride replaces the root README, Docker/Compose entry and adds its own TP2 scripts, profile, locks and documentation. Inherited automatic image-publishing workflows are removed. The remaining legacy launchers/docs are upstream development material, outside QwenStride's first supported profile.
+Upstream source/license/copyright notices remain in place. [README.hyperqwen.md](README.hyperqwen.md) preserves the pinned upstream README. QwenRelay replaces the root README, Docker/Compose entry and adds its own TP2 scripts, profile, locks and documentation. Inherited automatic image-publishing workflows are removed. The remaining legacy launchers/docs are upstream development material, outside QwenRelay's first supported profile.
 
 The inherited patch stack contains 50 ordered patches in `patches/series` followed by four KVarN patches; KVarN modules are copied before the latter. `patches/apply.sh` remains the upstream patch application authority. Source locks verify those files before any reconstruction.
 

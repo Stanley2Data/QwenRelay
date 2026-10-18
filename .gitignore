@@ -16,7 +16,7 @@ venv
 api_key.txt
 bench/results/
 
-# QwenStride local build and run state
+# QwenRelay local build and run state
 .venv/
 .build/
 .cache/

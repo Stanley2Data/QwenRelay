@@ -1,6 +1,6 @@
-# Install QwenStride 0.1
+# Install QwenRelay 0.1
 
-[中文](qwenstride-install.zh-CN.md) · [README](../README.md)
+[中文](qwenrelay-install.zh-CN.md) · [README](../README.md)
 
 ## Requirements and scope
 
@@ -13,17 +13,17 @@ Allow at least 64 GiB available system RAM for model loading plus the 32 GiB hos
 Install Python 3.12 with venv/dev support, a C/C++ toolchain, Git, GNU patch, curl and CA certificates using your distribution. Do not reuse a model-serving venv.
 
 ```bash
-bash scripts/install-qwenstride.sh
+bash scripts/install-qwenrelay.sh
 ```
 
-The installer refuses an existing `.venv`, installs the direct dependency pins in `requirements-qwenstride.txt`, retrieves vLLM commit `db9527a46873454610df6dbedf79a36d6bf1a7f6`, reconstructs the exact final F Python tree, and overlays it into the new venv while preserving the wheel's native extensions. It validates the source and native files. It starts no model and downloads no model weights.
+The installer refuses an existing `.venv`, installs the direct dependency pins in `requirements-qwenrelay.txt`, retrieves vLLM commit `db9527a46873454610df6dbedf79a36d6bf1a7f6`, reconstructs the exact final F Python tree, and overlays it into the new venv while preserving the wheel's native extensions. It validates the source and native files. It starts no model and downloads no model weights.
 
-Optional inputs: `PYTHON`, `QWENSTRIDE_VENV`, `QWENSTRIDE_BUILD`, and `VLLM_SOURCE` for an existing pristine checkout. The output build directory must be new. Transitive dependencies and OS package versions are resolved by pip/apt, so this is a pinned source/ABI recipe, not a hermetic dependency lock or byte-identical native build. Preserve `pip freeze` and native-file hashes when reproducing results.
+Optional inputs: `PYTHON`, `QWENRELAY_VENV`, `QWENRELAY_BUILD`, and `VLLM_SOURCE` for an existing pristine checkout. The output build directory must be new. Transitive dependencies and OS package versions are resolved by pip/apt, so this is a pinned source/ABI recipe, not a hermetic dependency lock or byte-identical native build. Preserve `pip freeze` and native-file hashes when reproducing results.
 
 ## Model assets
 
 ```bash
-.venv/bin/python scripts/qwenstride.py fetch-models --root ./models
+.venv/bin/python scripts/qwenrelay.py fetch-models --root ./models
 ```
 
 This is an explicit network/download action. It uses full repository commit pins from `locks/models.json`, verifies each downloaded file's full SHA256 and size, and refuses mismatching existing files. Existing Hugging Face cache files can be reused. The model-author repositories are:
@@ -36,7 +36,7 @@ Weights are obtained from their authors under their model licenses; they are not
 The tested main tensor index and chat template are bundled textual metadata. The index maps the public main tensor file and BF16 vision/MTP file to the tested filenames; only language-model serving is enabled. Additional source manifests/README files are not required by the loader. Check a prepared directory without downloading:
 
 ```bash
-.venv/bin/python scripts/qwenstride.py check-models --root /absolute/path/to/models
+.venv/bin/python scripts/qwenrelay.py check-models --root /absolute/path/to/models
 ```
 
 Expected children are `Qwen3.8-27B-EfficientThink-AWQ-W4A16` and `Qwen3.8-27B-DFlash2-W4A16`. Do not use an unverified partial download. The launcher verifies full asset hashes before every start; this can take time for ~21 GiB of weights.
@@ -46,35 +46,35 @@ Expected children are `Qwen3.8-27B-EfficientThink-AWQ-W4A16` and `Qwen3.8-27B-DF
 ```bash
 umask 077
 .venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))' > api_key.txt
-bash scripts/start-qwenstride.sh --models-root ./models --devices 0,1 --dry-run
-bash scripts/start-qwenstride.sh --models-root ./models --devices 0,1
+bash scripts/start-qwenrelay.sh --models-root ./models --devices 0,1 --dry-run
+bash scripts/start-qwenrelay.sh --models-root ./models --devices 0,1
 ```
 
 Choose the two GPUs explicitly. The default bind is loopback and port 18020; use `--port`, `--host`, `--api-key-file` or their documented environment equivalents in `.env.example` when needed. The native launcher does not source `.env` as shell code; export variables or pass flags. `--dry-run` prints the planned nonsecret configuration without checking installed runtime/models or touching CUDA. It is not a deployment validation.
 
-`config/dual-3090.json` is the single numerical-profile authority. Model paths, device indices, API key and bind/port are runtime inputs. The launcher clears inherited `INT8_ACT`, `VLLM_MARLIN_INPUT_DTYPE` and the alternative upstream `VLLM_PREFILL_ATTN` route, and fixes the sampler/V2-runner flags to the tested path. Other profiles/legacy upstream launchers do not implement the supported QwenStride configuration.
+`config/dual-3090.json` is the single numerical-profile authority. Model paths, device indices, API key and bind/port are runtime inputs. The launcher clears inherited `INT8_ACT`, `VLLM_MARLIN_INPUT_DTYPE` and the alternative upstream `VLLM_PREFILL_ATTN` route, and fixes the sampler/V2-runner flags to the tested path. Other profiles/legacy upstream launchers do not implement the supported QwenRelay configuration.
 
 ## Docker recipe
 
-The root Dockerfile builds the same source/venv recipe; there is no prebuilt QwenStride image or registry dependency. Prepare models and `api_key.txt` first. Copy `.env.example` to `.env`, set `MODEL_ASSET_DIR` to an absolute host model directory, then:
+The root Dockerfile builds the same source/venv recipe; there is no prebuilt QwenRelay image or registry dependency. Prepare models and `api_key.txt` first. Copy `.env.example` to `.env`, set `MODEL_ASSET_DIR` to an absolute host model directory, then:
 
 ```bash
 docker compose build
 docker compose up -d
-docker compose logs -f qwenstride
+docker compose logs -f qwenrelay
 ```
 
 The Compose configuration exposes all NVIDIA devices to the container and selects the two `CUDA_VISIBLE_DEVICES` indices (default `0,1`). HTTP is published to host loopback only. The model bind mount is read-only, the key is a mounted secret and the compile cache is a named volume. Shared memory is 40 GiB for the host-cache path. No privileged mode, host Docker socket, controller, or automatic restart is required. Stop this deployment with `docker compose down` when you choose to.
 
-**This recipe was not built or GPU-started during repository packaging.** The installed TP2 runtime was validated previously; fresh-container success remains a separate validation step. See [the exact boundary](qwenstride-validation.md).
+**This recipe was not built or GPU-started during repository packaging.** The installed TP2 runtime was validated previously; fresh-container success remains a separate validation step. See [the exact boundary](qwenrelay-validation.md).
 
 ## Offline reconstruction and checks
 
 No vLLM/PyTorch import is required for these commands. Python 3.12+, Git/Bash and GNU patch suffice:
 
 ```bash
-python3 scripts/qwenstride.py check-pack
-python3 scripts/qwenstride.py rebuild --vllm-source /path/to/pristine-vllm --target /new/path/final-F
+python3 scripts/qwenrelay.py check-pack
+python3 scripts/qwenrelay.py rebuild --vllm-source /path/to/pristine-vllm --target /new/path/final-F
 python3 -m unittest discover -s tests -v
 ```
 

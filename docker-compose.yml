@@ -1,11 +1,11 @@
 services:
-  qwenstride:
+  qwenrelay:
     build: .
     shm_size: '40gb'
     environment:
       CUDA_VISIBLE_DEVICES: '${CUDA_VISIBLE_DEVICES:-0,1}'
       MODELS_ROOT: /models
-      API_KEY_FILE: /run/secrets/qwenstride_api_key
+      API_KEY_FILE: /run/secrets/qwenrelay_api_key
       BIND_HOST: 0.0.0.0
       PORT: '18020'
     ports:
@@ -15,9 +15,9 @@ services:
         source: '${MODEL_ASSET_DIR:?Set an absolute MODEL_ASSET_DIR in .env}'
         target: /models
         read_only: true
-      - qwenstride-cache:/cache
+      - qwenrelay-cache:/cache
     secrets:
-      - qwenstride_api_key
+      - qwenrelay_api_key
     deploy:
       resources:
         reservations:
@@ -26,7 +26,7 @@ services:
               count: all
               capabilities: [gpu]
 secrets:
-  qwenstride_api_key:
+  qwenrelay_api_key:
     file: ./api_key.txt
 volumes:
-  qwenstride-cache:
+  qwenrelay-cache:

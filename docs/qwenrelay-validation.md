@@ -4,7 +4,7 @@ The first supported profile is two RTX 3090 24 GB GPUs, native Linux, TP2, the e
 
 ## Recorded runtime evidence
 
-The final F candidate's four-request main/draft FULL20 CUDA Graph capture and actual replay were observed on both TP ranks. The H/F comparison completed the original22 and additional10 context/decode cases with one complete warm round and three formal rounds per arm. A separate repaired-F cache-restoration acceptance completed the original30 requests. See [benchmark details and limits](qwenstride-benchmarks.md).
+The final F candidate's four-request main/draft FULL20 CUDA Graph capture and actual replay were observed on both TP ranks. The H/F comparison completed the original22 and additional10 context/decode cases with one complete warm round and three formal rounds per arm. A separate repaired-F cache-restoration acceptance completed the original30 requests. See [benchmark details and limits](qwenrelay-benchmarks.md).
 
 The ported source tree is locked to3,208 files. The source candidate is not the earlier F that lacked Graph20 coverage or the earlier F that restored zero CPU-cache tokens. The ongoing single-card profile and new model-weight experiments are not included.
 
@@ -14,7 +14,7 @@ The repository's `rebuild` command was actually executed offline from the pinned
 
 The main and draft configs were also retrieved read-only from the public full commit pins and matched the asset-lock SHA256 values. This did not download model tensors or rerun inference. Model-weight identities rely on the previously completed full SHA checks and the startup verifier; weights are excluded from Git.
 
-Shell syntax/LF, public Python/JSON syntax, profile equality with the recorded launch contract, Compose structure, local Markdown links and accidental private-material export are checked before the local candidate commit. [Packaging validation JSON](qwenstride-packaging-validation.json) records the completed checks, with no host paths or credentials.
+Shell syntax/LF, public Python/JSON syntax, profile equality with the recorded launch contract, Compose structure, local Markdown links and accidental private-material export are checked before the local candidate commit. [Packaging validation JSON](qwenrelay-packaging-validation.json) records the completed checks, with no host paths or credentials.
 
 ## Still unverified in this packaging step
 
@@ -22,4 +22,4 @@ Shell syntax/LF, public Python/JSON syntax, profile equality with the recorded l
 - New GPU numerical, quality, speed or cache-recovery runs after packaging. Existing evidence is retained at its original scope.
 - Single-GPU serving, other GPU models/drivers, other checkpoints, vision, maximum simultaneous256K contexts, high-concurrency deployment and long-running stability.
 
-The Docker image/base and direct dependency versions are pinned, but transitive pip and OS packages are not fully hermetic. Do not call the recipe a byte-identical runtime build. A successful offline reconstruction does not certify GPU behavior or deployment readiness. No upstream container image is presented as a QwenStride image; there is no automatic publishing workflow.
+The Docker image/base and direct dependency versions are pinned, but transitive pip and OS packages are not fully hermetic. Do not call the recipe a byte-identical runtime build. A successful offline reconstruction does not certify GPU behavior or deployment readiness. No upstream container image is presented as a QwenRelay image; there is no automatic publishing workflow.

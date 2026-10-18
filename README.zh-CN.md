@@ -1,12 +1,12 @@
-# QwenStride
+# QwenRelay
 
 **面向双 RTX 3090 的 Qwen 推理优化：长上下文、小并发，以及可恢复复用的会话缓存。**
 
-[English](README.md) · [安装文档](docs/qwenstride-install.zh-CN.md) · [性能与口径](docs/qwenstride-benchmarks.md) · [上游和归属](UPSTREAM.md)
+[English](README.md) · [安装文档](docs/qwenrelay-install.zh-CN.md) · [性能与口径](docs/qwenrelay-benchmarks.md) · [上游和归属](UPSTREAM.md)
 
-QwenStride 基于 [HyperQwen](https://github.com/syv-ai/HyperQwen)，固定 vLLM 0.31.0。首版支持已经实测的 **双 RTX 3090 24 GB、TP2、DFlash2 深度 4** 配置，包含 E2 对齐 INT8 KV、O4 主机历史缓存、PF2/O2/O5 预填充优化、CPU 缓存恢复和四路 CUDA Graph 覆盖修复。
+QwenRelay 基于 [HyperQwen](https://github.com/syv-ai/HyperQwen)，固定 vLLM 0.31.0。首版支持已经实测的 **双 RTX 3090 24 GB、TP2、DFlash2 深度 4** 配置，包含 E2 对齐 INT8 KV、O4 主机历史缓存、PF2/O2/O5 预填充优化、CPU 缓存恢复和四路 CUDA Graph 覆盖修复。
 
-当前是首版源码候选。底层 TP2 F 已有 GPU 性能及缓存恢复验证；**本次新整理的安装脚本和 Docker 路径完成离线检查，尚未重新执行全新 Docker 构建与模型启动。** 详见[验证范围](docs/qwenstride-validation.md)。
+当前是首版源码候选。底层 TP2 F 已有 GPU 性能及缓存恢复验证；**本次新整理的安装脚本和 Docker 路径完成离线检查，尚未重新执行全新 Docker 构建与模型启动。** 详见[验证范围](docs/qwenrelay-validation.md)。
 
 ## 首版配置
 
@@ -25,26 +25,31 @@ QwenStride 基于 [HyperQwen](https://github.com/syv-ai/HyperQwen)，固定 vLLM
 
 ## 快速开始
 
+```bash
+git clone https://github.com/Stanley2Data/QwenRelay.git
+cd QwenRelay
+```
+
 进入仓库目录；准备兼容的 NVIDIA 驱动、Linux Python 3.12、Git 和 GNU patch：
 
 ```bash
 # 创建全新 .venv，安装依赖并重建固定源码；不会启动模型。
-bash scripts/install-qwenstride.sh
+bash scripts/install-qwenrelay.sh
 
 # 显式下载固定主模型和草稿，约 21 GiB；Git 不包含权重。
-.venv/bin/python scripts/qwenstride.py fetch-models --root ./models
+.venv/bin/python scripts/qwenrelay.py fetch-models --root ./models
 
 umask 077
 .venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))' > api_key.txt
 
 # 只查看启动计划，不加载模型、不探测 GPU。
-bash scripts/start-qwenstride.sh --devices 0,1 --dry-run
+bash scripts/start-qwenrelay.sh --devices 0,1 --dry-run
 
 # 完整检查权重及运行库身份后启动。
-bash scripts/start-qwenstride.sh --devices 0,1
+bash scripts/start-qwenrelay.sh --devices 0,1
 ```
 
-默认接口为 `http://127.0.0.1:18020/v1`，模型名 `qwenstride`，API key 从本地 `api_key.txt` 读取。在 OpenAI 兼容客户端中填写这个地址和 key。详细驱动、内存、Docker 和已有权重接入方法见[中文安装文档](docs/qwenstride-install.zh-CN.md)。
+默认接口为 `http://127.0.0.1:18020/v1`，模型名 `qwenrelay`，API key 从本地 `api_key.txt` 读取。在 OpenAI 兼容客户端中填写这个地址和 key。详细驱动、内存、Docker 和已有权重接入方法见[中文安装文档](docs/qwenrelay-install.zh-CN.md)。
 
 ## 优化内容
 
@@ -53,7 +58,7 @@ bash scripts/start-qwenstride.sh --devices 0,1
 - **PF2/O2/O5**：Prefill 复用 INT8 KV，覆盖限定形状的 TP2 路径并保留原生回退。O5 优化符合条件的变长混合预填充，纯 Decode 加速来自独立的 Graph 修复。
 - **CUDA Graph**：捕获至 20 tokens，覆盖四请求 ×（4 草稿 + 1 验证），同时适配编译缓存身份及缓冲区生命周期。
 
-源码身份见 [locks/source.json](locks/source.json)，增量补丁见 [patches/qwenstride](patches/qwenstride)。
+源码身份见 [locks/source.json](locks/source.json)，增量补丁见 [patches/qwenrelay](patches/qwenrelay)。
 
 ## 实测表现
 
@@ -65,12 +70,12 @@ bash scripts/start-qwenstride.sh --devices 0,1
 | 真实题 C4，默认采样 | 107.50 tok/s | 360.11 tok/s |
 | 合成 1K 输入 C4，T0，固定生成 1,024 tokens | 167.46 tok/s | 538.45 tok/s |
 
-也保留回退：原 T0 C2 −2.63%、默认采样 C1 −1.85%；合成 1K C1 波动较大。128K C4 双方均没有合格的四路共同稳态生成片段，不能称为纯四路稳态 Decode。完整十档 Decode、总吞吐与方法限制见[性能文档](docs/qwenstride-benchmarks.md)。
+也保留回退：原 T0 C2 −2.63%、默认采样 C1 −1.85%；合成 1K C1 波动较大。128K C4 双方均没有合格的四路共同稳态生成片段，不能称为纯四路稳态 Decode。完整十档 Decode、总吞吐与方法限制见[性能文档](docs/qwenrelay-benchmarks.md)。
 
 ## 开发与来源
 
 ```bash
-python3 scripts/qwenstride.py check-pack
+python3 scripts/qwenrelay.py check-pack
 python3 -m unittest discover -s tests -v
 ```
 

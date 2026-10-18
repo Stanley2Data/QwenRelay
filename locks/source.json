@@ -16187,7 +16187,7 @@
   ],
   "local_series": [
     {
-      "path": "patches/qwenstride/0001-e2-and-compile-identity.patch",
+      "path": "patches/qwenrelay/0001-e2-and-compile-identity.patch",
       "sha256": "737a0a9aaf1ad1ddd66cf8a24bc82258246f3b1aefb4d3d0b93cafcf7e6c8f6e",
       "files": [
         "vllm/envs.py",
@@ -16197,7 +16197,7 @@
       ]
     },
     {
-      "path": "patches/qwenstride/0002-pf2-o2-o5-prefill.patch",
+      "path": "patches/qwenrelay/0002-pf2-o2-o5-prefill.patch",
       "sha256": "6d83a921f4f9c126cc4b776af684c9da8970ee3047f239c03668adfed668443e",
       "files": [
         "vllm/v1/attention/ops/qwen031/__init__.py",
@@ -16211,7 +16211,7 @@
       ]
     },
     {
-      "path": "patches/qwenstride/0003-o4-cpu-cache.patch",
+      "path": "patches/qwenrelay/0003-o4-cpu-cache.patch",
       "sha256": "9b26f7b765aef6033ea52ad2a5350df353d9bf2265c46784c38b5f4cc3523be9",
       "files": [
         "vllm/distributed/kv_transfer/kv_connector/v1/offloading/config.py",
