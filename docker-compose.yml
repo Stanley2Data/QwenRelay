@@ -2,8 +2,9 @@ services:
   qwenrelay:
     build: .
     shm_size: '40gb'
+    command: ['--tp', '${TP:-1}']
     environment:
-      CUDA_VISIBLE_DEVICES: '${CUDA_VISIBLE_DEVICES:-0,1}'
+      CUDA_VISIBLE_DEVICES: '${CUDA_VISIBLE_DEVICES:-0}'
       MODELS_ROOT: /models
       API_KEY_FILE: /run/secrets/qwenrelay_api_key
       BIND_HOST: 0.0.0.0

@@ -4,9 +4,9 @@
 
 ## Requirements and scope
 
-The supported profile is native Linux x86-64, Python 3.12 and two RTX 3090 24 GB GPUs. The recorded benchmark host used NVIDIA driver 580.126.20 and CUDA 13.0 userspace. Use a driver compatible with that userspace; `libcuda.so.1` comes from the host driver/container runtime, not this source repo. Have a working NVIDIA Container Toolkit when using Docker. Do not install a GPU driver from this project.
+Profiles target native Linux x86-64, Python 3.12 and RTX 3090 24 GB GPUs. The default is one card / AutoRound-fast; `--tp 2` and `--tp 4` select EfficientThink. See [profile selection and merge validation](qwenrelay-tp-profiles.md). The recorded benchmark host used NVIDIA driver 580.126.20 and CUDA 13.0 userspace. Use a driver compatible with that userspace; `libcuda.so.1` comes from the host driver/container runtime, not this source repo. Have a working NVIDIA Container Toolkit when using Docker. Do not install a GPU driver from this project.
 
-Allow at least 64 GiB available system RAM for model loading plus the 32 GiB host-cache budget; more headroom is useful during compilation. Allow roughly 60 GiB free disk for models, runtime dependencies, source and compilation caches. These are planning allowances, not measured minimums. The explicit KV allocation is 11,184,101,204 bytes per GPU. Profile changes need separate capacity/accuracy/performance verification.
+Allow at least 64 GiB available system RAM for model loading plus the 32 GiB host-cache budget; more headroom is useful during compilation. Allow roughly 60 GiB free disk for models, runtime dependencies, source and compilation caches. These are planning allowances, not measured minimums. GPU KV is 6 GiB for TP1, 11,184,101,204 bytes per rank for TP2, and 14 GiB per rank for TP4. Profile changes need separate capacity/accuracy/performance verification.
 
 ## Native installation
 
@@ -26,33 +26,144 @@ Optional inputs: `PYTHON`, `QWENRELAY_VENV`, `QWENRELAY_BUILD`, and `VLLM_SOURCE
 .venv/bin/python scripts/qwenrelay.py fetch-models --root ./models
 ```
 
-This is an explicit network/download action. It uses full repository commit pins from `locks/models.json`, verifies each downloaded file's full SHA256 and size, and refuses mismatching existing files. Existing Hugging Face cache files can be reused. The model-author repositories are:
+The default downloads the upstream HyperQwen AutoRound-fast inputs at fixed revisions,
+prepares the embedding on CPU, and verifies the exact measured final hashes from
+`locks/models-tp1.json`. Public sources are the
+[dbirks base](https://huggingface.co/dbirks/Qwen3.8-27B-W4A16-AutoRound/tree/1f05c441c4e64ae0549de44fa9ea5a6d43610314),
+[syvai fast components](https://huggingface.co/syvai/qwen3.8-27b-3090-fast-variant/tree/124c14e7e8c7d2f5402933b9af368e772a9fcf0c)
+and [syvai DFlash2 W4A16](https://huggingface.co/syvai/Qwen3.8-27B-DFlash2-W4A16/tree/4d30ec736ffc6b8688dc2ae2b502d9b48bdec279).
+Existing primary directories are checked rather than modified. Downloaded Hugging Face
+cache files can be reused. The full large-file preparation has not been rerun in this
+packaging step; a mismatch fails instead of changing the lock.
 
-- [EfficientThink SimPO](https://huggingface.co/nerkyor/Qwen3.8-27B-EfficientThink-Uncensored-K3-Opus5-Grok4.6-GPT5.6Sol-SFT-SimPO-DFlash2), commit `882e1af3b8f5844f3b3163b132e343c06e91908f`, `NVFP4/AWQ-W4A16/` (the selected subdirectory is AWQ, not NVFP4).
-- [syvai DFlash2 W4A16](https://huggingface.co/syvai/Qwen3.8-27B-DFlash2-W4A16), commit `4d30ec736ffc6b8688dc2ae2b502d9b48bdec279`.
-
-Weights are obtained from their authors under their model licenses; they are not redistributed here. This profile uses 367 W4 asymmetric and 33 W8 symmetric main-model target entries, BF16 activations, and a GPTQ W4A16 draft. It does not substitute AutoRound, Coder390, an FP8 draft, or activation INT8.
-
-The tested main tensor index and chat template are bundled textual metadata. The index maps the public main tensor file and BF16 vision/MTP file to the tested filenames; only language-model serving is enabled. Additional source manifests/README files are not required by the loader. Check a prepared directory without downloading:
+TP2/TP4 use the original `locks/models.json`, with
+[EfficientThink SimPO](https://huggingface.co/nerkyor/Qwen3.8-27B-EfficientThink-Uncensored-K3-Opus5-Grok4.6-GPT5.6Sol-SFT-SimPO-DFlash2/tree/882e1af3b8f5844f3b3163b132e343c06e91908f/NVFP4/AWQ-W4A16)
+and the same DFlash2 drafter. Its primary uses 367 W4 asymmetric and 33 W8 symmetric
+target entries. All profiles keep BF16 activations and INT8 KV; none selects an FP8
+draft. Weights are downloaded from their authors under their respective licenses.
+Git contains only the necessary metadata and source, including the fixed serving
+chat template. Language-model-only serving remains enabled.
 
 ```bash
-.venv/bin/python scripts/qwenrelay.py check-models --root /absolute/path/to/models
+# Explicit TP1 is equivalent to omitting --tp.
+.venv/bin/python scripts/qwenrelay.py check-models --tp 1 --root /absolute/path/to/models
+# Download EfficientThink once for TP2 and TP4.
+.venv/bin/python scripts/qwenrelay.py fetch-models --tp 2 --root ./models
+.venv/bin/python scripts/qwenrelay.py check-models --tp 4 --root ./models
 ```
 
-Expected children are `Qwen3.8-27B-EfficientThink-AWQ-W4A16` and `Qwen3.8-27B-DFlash2-W4A16`. Do not use an unverified partial download. The launcher verifies full asset hashes before every start; this can take time for ~21 GiB of weights.
+TP1 expects `Qwen3.8-27B-W4A16-AutoRound-fast/`; TP2/TP4 expect
+`Qwen3.8-27B-EfficientThink-AWQ-W4A16/`. Both use `Qwen3.8-27B-DFlash2-W4A16/`.
+These directories may coexist. Startup reads and checks all selected asset hashes,
+which can take time for large weights. Preparation details are in the
+[TP profile guide](qwenrelay-tp-profiles.md#weight-preparation).
 
 ## Start and inspect
 
 ```bash
 umask 077
 .venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))' > api_key.txt
-bash scripts/start-qwenrelay.sh --models-root ./models --devices 0,1 --dry-run
-bash scripts/start-qwenrelay.sh --models-root ./models --devices 0,1
+bash scripts/start-qwenrelay.sh --models-root ./models --devices 0 --dry-run
+bash scripts/start-qwenrelay.sh --models-root ./models --devices 0
 ```
 
-Choose the two GPUs explicitly. The default bind is loopback and port 18020; use `--port`, `--host`, `--api-key-file` or their documented environment equivalents in `.env.example` when needed. The native launcher does not source `.env` as shell code; export variables or pass flags. `--dry-run` prints the planned nonsecret configuration without checking installed runtime/models or touching CUDA. It is not a deployment validation.
+Default TP1 uses one GPU. Pass `--tp 2 --devices 0,1` or `--tp 4 --devices 0,1,2,3` to select the corresponding multi-GPU profile. The default bind is loopback and port 18020; use `--port`, `--host`, `--api-key-file` or their documented environment equivalents in `.env.example` when needed. The native launcher does not source `.env` as shell code; export variables or pass flags. `--dry-run` prints the planned nonsecret configuration without checking installed runtime/models or touching CUDA. It is not a deployment validation.
 
-`config/dual-3090.json` is the single numerical-profile authority. Model paths, device indices, API key and bind/port are runtime inputs. The launcher clears inherited `INT8_ACT`, `VLLM_MARLIN_INPUT_DTYPE` and the alternative upstream `VLLM_PREFILL_ATTN` route, and fixes the sampler/V2-runner flags to the tested path. Other profiles/legacy upstream launchers do not implement the supported QwenRelay configuration.
+`config/single-3090.json`, `dual-3090.json` and `quad-3090.json` define the three resource/optimization profiles. Model paths, device indices, API key and bind/port are runtime inputs. The launcher clears inherited `INT8_ACT`, `VLLM_MARLIN_INPUT_DTYPE` and the alternative upstream `VLLM_PREFILL_ATTN` route, and fixes the sampler/V2-runner flags to the tested path. Other profiles/legacy upstream launchers do not implement the supported QwenRelay configuration.
+
+## Launch overrides
+
+The launcher reads TP/profile defaults, then applies explicit arguments. Omitted
+values keep their selected defaults; JSON profiles are not rewritten. Checkpoint
+selection stays TP1 → AutoRound-fast and TP2/TP4 → EfficientThink.
+
+| Argument | Alias | Units / behavior |
+|---|---|---|
+| `--max-num-seqs` | `--concurrency` | Positive maximum running request count, not client queue length. Default 4. |
+| `--max-model-len` | `--context-length` | Total context tokens per request, including input and output; must exceed draft depth. |
+| `--draft-tokens` | `--num-speculative-tokens` | DFlash verification depth, integer 1–63. Default 4. |
+| `--kv-cache-memory` | — | GPU KV budget per TP rank: exact bytes or an IEC size such as `5GiB`, `512MiB`, `3.5GiB`. Ambiguous `5G` / `5GB` are rejected. |
+| `--kv-offloading-size` | `--cpu-kv-gib` | CPU KV GiB summed across the TP group; decimals accepted. Default 32. Zero disables CPU offload/O4 and keeps GPU prefix caching. |
+| `--max-num-batched-tokens` | — | Positive scheduler token budget per step. Default 2,048. |
+
+GPU KV must resolve to positive whole bytes. CPU KV must be finite and nonnegative;
+negative values, NaN and Infinity are rejected. Given concurrency `C` and depth `K`,
+the launcher derives logical `VLLM_SPEC_DECODE_ATTN_QMAX=K+1` and
+`max_cudagraph_capture_size=C*(K+1)`. The batched-token budget must be at least that
+product; incompatible combinations fail before key access, model loading or CUDA.
+Scratch can round the logical QMAX up to a kernel tile. Graph coverage does not
+increase KV capacity or alter the draft model's trained block length. When depth
+exceeds that block, the existing lookup path attempts to fill extra verify positions.
+
+```bash
+# TP1 overrides: logical QMAX=7, Graph=14.
+bash scripts/start-qwenrelay.sh --tp 1 \
+  --max-num-seqs 2 --max-model-len 65536 --draft-tokens 6 \
+  --kv-cache-memory 5GiB --kv-offloading-size 16 --dry-run
+
+# TP2 with larger concurrency; omitted values keep TP2 defaults.
+bash scripts/start-qwenrelay.sh --tp 2 --devices 0,1 \
+  --concurrency 8 --context-length 65536 --draft-tokens 7 \
+  --max-num-batched-tokens 1024 --dry-run
+
+# Disable CPU offload; keep the other TP1 defaults.
+bash scripts/start-qwenrelay.sh --kv-offloading-size 0 --dry-run
+bash scripts/start-qwenrelay.sh --help
+```
+
+Inspect `overrides`, `effective_settings`, `environment` and the final `argv`.
+Remove `--dry-run` to start the server. Larger context does not allocate extra
+physical KV automatically; larger concurrency/depth costs scratch/Graph memory.
+Runtime model-limit and available-memory checks still apply. Custom settings do
+not inherit performance evidence from the default configuration. O5 currently
+optimizes eligible prefill batches of at most 4 requests and 2,048 query tokens;
+unsupported shapes retain native fallback rather than guaranteed acceleration.
+
+Docker uses the same entry point. Add arguments to the service's Compose `command`
+list, for example `['--tp', '1', '--max-num-seqs', '2', '--draft-tokens', '6']`,
+then recreate that container. Native launchers do not read `.env`; pass these
+overrides through the command line.
+
+## DFlash launch settings
+
+The `single-3090`, `dual-3090` and `quad-3090` profiles all explicitly include:
+
+```ini
+VLLM_SPEC_DECODE_ATTN=1
+VLLM_SPEC_DECODE_ATTN_QMAX=5
+VLLM_DFLASH2_LOOKUP=1
+```
+
+These configure this project's patched vLLM runtime, in addition to `--speculative-config` selecting the DFlash method and draft model. The earlier standalone launcher omitted the inherited settings; the omission caused a long-context performance regression even though DFlash itself still ran. Installing the source patches and matching model hashes does not establish an equivalent active configuration.
+
+| Setting | Purpose in the shipped depth-4 profiles |
+| --- | --- |
+| `VLLM_SPEC_DECODE_ATTN=1` | Enables the eligible split-KV speculative verification attention path. Without it, verification bypasses this optimization. |
+| `VLLM_SPEC_DECODE_ATTN_QMAX=5` | Sets the logical per-request query bound: 4 draft tokens + 1 verification token. GQA=6 rounds the actual scratch tile to 10 query tokens; allocation uses the real scheduler capacity at model load. Stable buffers matter for CUDA Graph capture. This is not the context length or the combined query count across concurrent requests. |
+| `VLLM_DFLASH2_LOOKUP=1` | Enables context-lookup-assisted draft proposals. Omitting it disables this assistance, not the entire DFlash model. |
+
+Use the literal value `1` for the two boolean switches; this runtime does not interpret `true` as enabled. The table's `5` is the depth-4 default; `--draft-tokens` derives QMAX and Graph coverage together. Direct vLLM launchers must keep them consistent themselves. Changed settings require separate validation.
+
+`scripts/start-qwenrelay.sh` and `scripts/qwenrelay.py serve` inject the effective values automatically; no extra exports are needed. Explicit CLI arguments override profile defaults, and those effective values override same-name parent environment variables. Use the tuning flags rather than an exported QMAX. The project Docker recipe uses the same launcher.
+
+If you bypass the launcher and invoke the patched vLLM directly, export these variables in the launching shell before starting Python. For a custom systemd unit that directly starts vLLM, the equivalent is:
+
+```ini
+[Service]
+Environment="VLLM_SPEC_DECODE_ATTN=1"
+Environment="VLLM_SPEC_DECODE_ATTN_QMAX=5"
+Environment="VLLM_DFLASH2_LOOKUP=1"
+```
+
+Apply a changed unit with `systemctl daemon-reload` and restart that service; editing a file or a separate shell does not update an existing process. Merely writing these lines into `.env` does not configure the native launcher, which does not source that file.
+
+Before a normal launch, inspect the plan:
+
+```bash
+bash scripts/start-qwenrelay.sh --devices 0 --dry-run
+```
+
+Check all three entries in `environment`, and check that the `argv` speculative configuration contains `method: dflash`, the selected `num_speculative_tokens` (default 4), `draft_sample_method: probabilistic` and the intended DFlash2 model path. With overrides also check the QMAX/Graph values in `effective_settings`. For TP4, use `--profile quad-3090 --devices 0,1,2,3`. A dry run confirms the plan only; after starting the real service, also inspect its process environment, startup configuration and nonzero `spec_decode` counters in `/metrics` after generation requests. Draft counters show speculative decoding activity, not proof that every request shape used the split-KV path.
 
 ## Docker recipe
 
@@ -64,7 +175,7 @@ docker compose up -d
 docker compose logs -f qwenrelay
 ```
 
-The Compose configuration exposes all NVIDIA devices to the container and selects the two `CUDA_VISIBLE_DEVICES` indices (default `0,1`). HTTP is published to host loopback only. The model bind mount is read-only, the key is a mounted secret and the compile cache is a named volume. Shared memory is 40 GiB for the host-cache path. No privileged mode, host Docker socket, controller, or automatic restart is required. Stop this deployment with `docker compose down` when you choose to.
+The Compose configuration exposes all NVIDIA devices to the container and uses `TP=1` and `CUDA_VISIBLE_DEVICES=0` by default. Set both `TP=2` / `CUDA_VISIBLE_DEVICES=0,1`, or `TP=4` / `CUDA_VISIBLE_DEVICES=0,1,2,3` in `.env` for the other profiles. HTTP is published to host loopback only. The model bind mount is read-only, the key is a mounted secret and the compile cache is a named volume. Shared memory is 40 GiB for the host-cache path. No privileged mode, host Docker socket, controller, or automatic restart is required. Stop this deployment with `docker compose down` when you choose to.
 
 **This recipe was not built or GPU-started during repository packaging.** The installed TP2 runtime was validated previously; fresh-container success remains a separate validation step. See [the exact boundary](qwenrelay-validation.md).
 
@@ -78,4 +189,4 @@ python3 scripts/qwenrelay.py rebuild --vllm-source /path/to/pristine-vllm --targ
 python3 -m unittest discover -s tests -v
 ```
 
-Reconstruction checks every pristine Python/config file after canonical UTF-8 CRLF→LF normalization, applies the 54 inherited patches in their recorded order, applies three local port patches, copies the final six-file cache/Graph overlay, parses all Python files, and checks all 3,208 canonical output files byte-for-byte. The public source differs from the tested Windows working-tree bytes only in text line endings; `locks/source.json` preserves the original raw hashes and normalization policy. Binary bytes and model assets are unchanged. The last two review patches document the overlay delta; do not apply them again. A verification JSON is written beside the new output directory. Existing outputs and wrong inputs are rejected.
+Reconstruction checks every pristine Python/config file after canonical UTF-8 CRLF→LF normalization, applies the 54 inherited patches in their recorded order, applies three local port patches, copies the final fifteen-file overlay, parses all Python files, and checks all 3,208 canonical output files byte-for-byte. The base source normalizes historical Windows text line endings; the subsequent TP1/TP4 merges record their own changed-file identities and validation limits.  `locks/source.json` preserves the original raw hashes and normalization policy. No model binaries are included in the source tree. The last two review patches document the overlay delta; do not apply them again. A verification JSON is written beside the new output directory. Existing outputs and wrong inputs are rejected.

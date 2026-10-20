@@ -1,12 +1,30 @@
 # Validation boundary for the 0.1 source candidate
 
-The first supported profile is two RTX 3090 24 GB GPUs, native Linux, TP2, the exact EfficientThink/DFlash2 assets and `config/dual-3090.json`. This document separates recorded runtime evidence from packaging checks.
+The original validated profile was two RTX 3090 24 GB GPUs, native Linux, TP2, the exact EfficientThink/DFlash2 assets and `config/dual-3090.json`. This document separates recorded runtime evidence from packaging checks.
+
+## Current source merge (2026-10-20)
+
+The default launcher now selects TP1 / AutoRound-fast; `--tp 2` and `--tp 4`
+select EfficientThink. This default does not change the scope of earlier GPU evidence.
+The merged tree has 15 final overlays and still 3,208 files, with explicit before/after
+identities for the eight files changed in this merge. Complete offline reconstruction
+and CPU allocation/dispatch checks passed. The complete public-input download/CPU
+embedding conversion, merged numerical GPU checks, real model/Graph startup, quality
+and cache-recovery validation remain pending. See [TP profiles and merge details](qwenrelay-tp-profiles.md).
+The older packaging report and recorded results below describe their original versions.
+
+The launch override extension applies concurrency, context, speculative depth and
+cache budgets after TP defaults. The current 22 CPU tests include all-TP overrides,
+unchanged defaults/assets, QMAX/Graph derivation, invalid values and combinations,
+exact GPU-memory units, zero-CPU-offload handling, and an actual shell-entry dry run
+without runtime/model/key access. These checks do not establish GPU capacity or
+performance for user-selected overrides.
 
 ## Recorded runtime evidence
 
 The final F candidate's four-request main/draft FULL20 CUDA Graph capture and actual replay were observed on both TP ranks. The H/F comparison completed the original22 and additional10 context/decode cases with one complete warm round and three formal rounds per arm. A separate repaired-F cache-restoration acceptance completed the original30 requests. See [benchmark details and limits](qwenrelay-benchmarks.md).
 
-The ported source tree is locked to3,208 files. The source candidate is not the earlier F that lacked Graph20 coverage or the earlier F that restored zero CPU-cache tokens. The ongoing single-card profile and new model-weight experiments are not included.
+The original ported source tree was locked to3,208 files. That source candidate was not the earlier F that lacked Graph20 coverage or the earlier F that restored zero CPU-cache tokens. These recorded runtime results exclude the later single-card profile and the current merged sources.
 
 ## Packaging checks
 

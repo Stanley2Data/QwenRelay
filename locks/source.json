@@ -32282,14 +32282,59 @@
       "bytes": 90886
     },
     {
+      "path": "vllm/model_executor/models/qwen3_dflash.py",
+      "sha256": "e1bf578585ce3c409ec98846afd8d26ccd7a8c44229f1764dc2f85cb4d6c8e40",
+      "bytes": 40614
+    },
+    {
       "path": "vllm/model_executor/models/qwen3_dflash2.py",
       "sha256": "1ca2474ec1ef915f4d813bd5982d349182112ddd68783a0794bb4fe9d19187f8",
       "bytes": 14135
     },
     {
+      "path": "vllm/v1/attention/backends/flash_attn.py",
+      "sha256": "89cca890fb03ae3e24de87cad8a5d170bbf83ea5388f28189d991fccb5e9ebbb",
+      "bytes": 92811
+    },
+    {
+      "path": "vllm/v1/attention/backends/triton_attn.py",
+      "sha256": "9d5a64977870c257492ae1b0efe7e38a16208a6ee64f0d96207e6e104f897b62",
+      "bytes": 48610
+    },
+    {
+      "path": "vllm/v1/attention/ops/qwen031/o2.py",
+      "sha256": "22abf234c9a89df7e68f791a79ea65be585a7d3fc7d4b3288746d9f3e2bdad2a",
+      "bytes": 5493
+    },
+    {
+      "path": "vllm/v1/attention/ops/qwen031/o5.py",
+      "sha256": "e33aecdeb00b3b8405d2cd4d27b3e796cd1a95d0a824fe91da8b22af2c2a1ec7",
+      "bytes": 5977
+    },
+    {
+      "path": "vllm/v1/attention/ops/qwen031/o5_kernels.py",
+      "sha256": "95f3ce27cb448fee294e53609c1b4f91bd13fb456a4f4c85588d47f4930380a2",
+      "bytes": 5383
+    },
+    {
+      "path": "vllm/v1/attention/ops/qwen031/pf2.py",
+      "sha256": "1748890faa96f6f46d5cc9f0bd085d2b138a63452bdf0cab08d2f30968275593",
+      "bytes": 6187
+    },
+    {
+      "path": "vllm/v1/kv_offload/cpu/qwen_o4.py",
+      "sha256": "c5426ce28f182d31b904d922f5d228e15a448198a491151fe65b812d2e0224c8",
+      "bytes": 31576
+    },
+    {
       "path": "vllm/v1/worker/gpu/cudagraph_utils.py",
       "sha256": "169147c789cd35324e0c841872873701b7657a4244e1f4273dbdbb153c1c702f",
       "bytes": 49052
+    },
+    {
+      "path": "vllm/v1/worker/gpu/spec_decode/dflash/utils.py",
+      "sha256": "e9cbe16ffa8efc1f43f37830a7a7e8532b09c98e3e057c89bd4843b02ec55d11",
+      "bytes": 3709
     }
   ],
   "final_F": [
@@ -33354,6 +33399,11 @@
       "bytes": 19545
     },
     {
+      "path": "vllm/distributed/kv_transfer/README.md",
+      "sha256": "7fd1af3944df0811644c2c2157d4460b82d72100a9a99c108f8b823ca1cd62bb",
+      "bytes": 1992
+    },
+    {
       "path": "vllm/distributed/kv_transfer/__init__.py",
       "sha256": "c1be4e58ec6923bae607a355ad22891c740f056a69ff7358b1e10ea3fd2680ea",
       "bytes": 552
@@ -33737,11 +33787,6 @@
       "path": "vllm/distributed/kv_transfer/kv_transfer_state.py",
       "sha256": "bcdbd57fab582202b62861a84a397c83559f5543de38ec04c3467a637318af62",
       "bytes": 3229
-    },
-    {
-      "path": "vllm/distributed/kv_transfer/README.md",
-      "sha256": "7fd1af3944df0811644c2c2157d4460b82d72100a9a99c108f8b823ca1cd62bb",
-      "bytes": 1992
     },
     {
       "path": "vllm/distributed/mooncake_store.py",
@@ -35354,6 +35399,11 @@
       "bytes": 3888
     },
     {
+      "path": "vllm/lora/ops/triton_ops/README_TUNING.md",
+      "sha256": "4dc46776fdb310d5573389f67e47b610d065cbf85465729ce6ff01c18720f896",
+      "bytes": 3089
+    },
+    {
       "path": "vllm/lora/ops/triton_ops/__init__.py",
       "sha256": "2f72d6e0aa9fe7baba78f1c5f8a4e97c781e6c14ba16798f4b5347dcd2b370ee",
       "bytes": 1029
@@ -35402,11 +35452,6 @@
       "path": "vllm/lora/ops/triton_ops/lora_shrink_op.py",
       "sha256": "f4551143d4c9244fb7a4ad6cdd5330f13e302332aca2c4eb97b8d84a84fe8918",
       "bytes": 8582
-    },
-    {
-      "path": "vllm/lora/ops/triton_ops/README_TUNING.md",
-      "sha256": "4dc46776fdb310d5573389f67e47b610d065cbf85465729ce6ff01c18720f896",
-      "bytes": 3089
     },
     {
       "path": "vllm/lora/ops/triton_ops/utils.py",
@@ -35609,6 +35654,11 @@
       "bytes": 9172
     },
     {
+      "path": "vllm/model_executor/kernels/linear/mixed_precision/MPLinearKernel.py",
+      "sha256": "f7a36e796da4a76b05fe7e2c0404fd2f7d28c0a30e8083cb68942c593b21fac2",
+      "bytes": 2555
+    },
+    {
       "path": "vllm/model_executor/kernels/linear/mixed_precision/__init__.py",
       "sha256": "8cb9a6e0e0ea576c267ed37ec48cc881e226cbad6a2bd36bf8c3690463947bc4",
       "bytes": 2078
@@ -35652,11 +35702,6 @@
       "path": "vllm/model_executor/kernels/linear/mixed_precision/marlin.py",
       "sha256": "4cc879baa515b752064fc8f0b37eacd156107237abc69a1250a4374de7ebd6bf",
       "bytes": 12162
-    },
-    {
-      "path": "vllm/model_executor/kernels/linear/mixed_precision/MPLinearKernel.py",
-      "sha256": "f7a36e796da4a76b05fe7e2c0404fd2f7d28c0a30e8083cb68942c593b21fac2",
-      "bytes": 2555
     },
     {
       "path": "vllm/model_executor/kernels/linear/mixed_precision/rdna3_w4a16.py",
@@ -35749,6 +35794,11 @@
       "bytes": 2929
     },
     {
+      "path": "vllm/model_executor/kernels/linear/mxfp8/Mxfp8LinearKernel.py",
+      "sha256": "248756d101c584d2893ab5ba906d2c8bbec49704b5fbad28fb0f7111a78ecaa8",
+      "bytes": 2144
+    },
+    {
       "path": "vllm/model_executor/kernels/linear/mxfp8/__init__.py",
       "sha256": "54d79270bcb90b0e6a391bef4cda2474cf59b8df2d1d8db876061d9399268706",
       "bytes": 304
@@ -35782,11 +35832,6 @@
       "path": "vllm/model_executor/kernels/linear/mxfp8/marlin.py",
       "sha256": "299c549e3e3830fe3b52ef83eca565356d6bd42e2a85805300a1bd0fe6a67e0c",
       "bytes": 2181
-    },
-    {
-      "path": "vllm/model_executor/kernels/linear/mxfp8/Mxfp8LinearKernel.py",
-      "sha256": "248756d101c584d2893ab5ba906d2c8bbec49704b5fbad28fb0f7111a78ecaa8",
-      "bytes": 2144
     },
     {
       "path": "vllm/model_executor/kernels/linear/mxfp8/rocm_block32_gemm.py",
@@ -35854,6 +35899,16 @@
       "bytes": 3469
     },
     {
+      "path": "vllm/model_executor/kernels/linear/scaled_mm/BlockScaledMMLinearKernel.py",
+      "sha256": "8c8989c50a4d64c5d67d2e9256be7a1e650722bcc07cb5c262c7472db82abc81",
+      "bytes": 7462
+    },
+    {
+      "path": "vllm/model_executor/kernels/linear/scaled_mm/ScaledMMLinearKernel.py",
+      "sha256": "d43d9aa7b3bff81f2ca9495c95995c7070c9e5bb2eed4531211c7f20d2e27c2f",
+      "bytes": 6226
+    },
+    {
       "path": "vllm/model_executor/kernels/linear/scaled_mm/__init__.py",
       "sha256": "bd39bc5992773855138bcebc2d7c3c1ecf6543d2cc7434476ad961173929933a",
       "bytes": 2604
@@ -35867,11 +35922,6 @@
       "path": "vllm/model_executor/kernels/linear/scaled_mm/b12x.py",
       "sha256": "032a0ce72aea45caadd72462935d7aec1348324dd589c3d5bfb6b03282ea77d1",
       "bytes": 11973
-    },
-    {
-      "path": "vllm/model_executor/kernels/linear/scaled_mm/BlockScaledMMLinearKernel.py",
-      "sha256": "8c8989c50a4d64c5d67d2e9256be7a1e650722bcc07cb5c262c7472db82abc81",
-      "bytes": 7462
     },
     {
       "path": "vllm/model_executor/kernels/linear/scaled_mm/cpu.py",
@@ -35912,11 +35962,6 @@
       "path": "vllm/model_executor/kernels/linear/scaled_mm/rocm.py",
       "sha256": "95a71a599561d3776d59ead788b76736f2a0c36ae1488360c024052f3747c231",
       "bytes": 3631
-    },
-    {
-      "path": "vllm/model_executor/kernels/linear/scaled_mm/ScaledMMLinearKernel.py",
-      "sha256": "d43d9aa7b3bff81f2ca9495c95995c7070c9e5bb2eed4531211c7f20d2e27c2f",
-      "bytes": 6226
     },
     {
       "path": "vllm/model_executor/kernels/linear/scaled_mm/triton.py",
@@ -36754,12 +36799,12 @@
       "bytes": 3264
     },
     {
-      "path": "vllm/model_executor/layers/fused_moe/configs/E=256,N=1024,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/fused_moe/configs/E=256,N=1024,device_name=AMD_Instinct_MI325X,block_shape=[128,128].json",
       "sha256": "7d3edfc23ba2b781db6f2444615dc4089f519bcf055be579e1edbb9c6f6703f4",
       "bytes": 4741
     },
     {
-      "path": "vllm/model_executor/layers/fused_moe/configs/E=256,N=1024,device_name=AMD_Instinct_MI325X,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/fused_moe/configs/E=256,N=1024,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "7d3edfc23ba2b781db6f2444615dc4089f519bcf055be579e1edbb9c6f6703f4",
       "bytes": 4741
     },
@@ -36804,12 +36849,12 @@
       "bytes": 3741
     },
     {
-      "path": "vllm/model_executor/layers/fused_moe/configs/E=256,N=256,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/fused_moe/configs/E=256,N=256,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "6e90cf6d3cab5cbc824b2fa8d1d8af79555e55417fc63f9f752cc2cd698470a0",
       "bytes": 4733
     },
     {
-      "path": "vllm/model_executor/layers/fused_moe/configs/E=256,N=256,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/fused_moe/configs/E=256,N=256,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "6e90cf6d3cab5cbc824b2fa8d1d8af79555e55417fc63f9f752cc2cd698470a0",
       "bytes": 4733
     },
@@ -36944,16 +36989,6 @@
       "bytes": 3251
     },
     {
-      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=256,device_name=AMD_Instinct_MI350_OAM,dtype=int4_w4a16,backend=flydsl.json",
-      "sha256": "be6f9b867e456f54f78b1a009d0ea747939409f5f76361a59d913f3ca75cbef5",
-      "bytes": 2134
-    },
-    {
-      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=256,device_name=AMD_Instinct_MI350_OAM,dtype=int4_w4a16.json",
-      "sha256": "87c626c58b970cc122492ff5f911ec8a362fe490ae6f9806732a8befe100e2c5",
-      "bytes": 4533
-    },
-    {
       "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=256,device_name=AMD_Instinct_MI350X,dtype=int4_w4a16,backend=flydsl.json",
       "sha256": "be6f9b867e456f54f78b1a009d0ea747939409f5f76361a59d913f3ca75cbef5",
       "bytes": 2134
@@ -36964,12 +36999,12 @@
       "bytes": 4533
     },
     {
-      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=256,device_name=AMD_Instinct_MI355_OAM,dtype=int4_w4a16,backend=flydsl.json",
+      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=256,device_name=AMD_Instinct_MI350_OAM,dtype=int4_w4a16,backend=flydsl.json",
       "sha256": "be6f9b867e456f54f78b1a009d0ea747939409f5f76361a59d913f3ca75cbef5",
       "bytes": 2134
     },
     {
-      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=256,device_name=AMD_Instinct_MI355_OAM,dtype=int4_w4a16.json",
+      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=256,device_name=AMD_Instinct_MI350_OAM,dtype=int4_w4a16.json",
       "sha256": "87c626c58b970cc122492ff5f911ec8a362fe490ae6f9806732a8befe100e2c5",
       "bytes": 4533
     },
@@ -36984,6 +37019,16 @@
       "bytes": 4533
     },
     {
+      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=256,device_name=AMD_Instinct_MI355_OAM,dtype=int4_w4a16,backend=flydsl.json",
+      "sha256": "be6f9b867e456f54f78b1a009d0ea747939409f5f76361a59d913f3ca75cbef5",
+      "bytes": 2134
+    },
+    {
+      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=256,device_name=AMD_Instinct_MI355_OAM,dtype=int4_w4a16.json",
+      "sha256": "87c626c58b970cc122492ff5f911ec8a362fe490ae6f9806732a8befe100e2c5",
+      "bytes": 4533
+    },
+    {
       "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=256,device_name=NVIDIA_B200,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "05d5639436569d7ebfaddb814d059f73a19be28f73f094652395c5d340a7242f",
       "bytes": 3255
@@ -36994,22 +37039,22 @@
       "bytes": 3255
     },
     {
-      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=512,device_name=AMD_Instinct_MI350_OAM,dtype=int4_w4a16,backend=flydsl.json",
-      "sha256": "b28b03a33a8ade6d8d1b1db838cc0aa11bb145aaa182468c321df577c2d5e13f",
-      "bytes": 2131
-    },
-    {
       "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=512,device_name=AMD_Instinct_MI350X,dtype=int4_w4a16,backend=flydsl.json",
       "sha256": "b28b03a33a8ade6d8d1b1db838cc0aa11bb145aaa182468c321df577c2d5e13f",
       "bytes": 2131
     },
     {
-      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=512,device_name=AMD_Instinct_MI355_OAM,dtype=int4_w4a16,backend=flydsl.json",
+      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=512,device_name=AMD_Instinct_MI350_OAM,dtype=int4_w4a16,backend=flydsl.json",
       "sha256": "b28b03a33a8ade6d8d1b1db838cc0aa11bb145aaa182468c321df577c2d5e13f",
       "bytes": 2131
     },
     {
       "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=512,device_name=AMD_Instinct_MI355X,dtype=int4_w4a16,backend=flydsl.json",
+      "sha256": "b28b03a33a8ade6d8d1b1db838cc0aa11bb145aaa182468c321df577c2d5e13f",
+      "bytes": 2131
+    },
+    {
+      "path": "vllm/model_executor/layers/fused_moe/configs/E=384,N=512,device_name=AMD_Instinct_MI355_OAM,dtype=int4_w4a16,backend=flydsl.json",
       "sha256": "b28b03a33a8ade6d8d1b1db838cc0aa11bb145aaa182468c321df577c2d5e13f",
       "bytes": 2131
     },
@@ -39294,12 +39339,12 @@
       "bytes": 3799
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=1536,K=1536,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=1536,K=1536,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "08d23e23d9dca8727bba4a73832c5d26dcf46dddbdbec802dfcb6f30ce935755",
       "bytes": 3803
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=1536,K=1536,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=1536,K=1536,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "08d23e23d9dca8727bba4a73832c5d26dcf46dddbdbec802dfcb6f30ce935755",
       "bytes": 3803
     },
@@ -39334,12 +39379,12 @@
       "bytes": 3799
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=1536,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=1536,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "4539d33c540d8392542db3cb5890d344d4591c8ec5b2b4f1a920e465f49b9b3c",
       "bytes": 3806
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=1536,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=1536,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "4539d33c540d8392542db3cb5890d344d4591c8ec5b2b4f1a920e465f49b9b3c",
       "bytes": 3806
     },
@@ -39389,12 +39434,12 @@
       "bytes": 3806
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=2048,K=512,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=2048,K=512,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "cc39d5a81aa04fe9cb933fc2a2ef8a4cfb0d21587e61b4c19e8f4bd8c81d4533",
       "bytes": 3803
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=2048,K=512,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=2048,K=512,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "cc39d5a81aa04fe9cb933fc2a2ef8a4cfb0d21587e61b4c19e8f4bd8c81d4533",
       "bytes": 3803
     },
@@ -39444,12 +39489,12 @@
       "bytes": 3801
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=2304,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=2304,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "96523a3d69520e041ffa8b930d790560ea12cfdbb76f3925c01b59618fdf5953",
       "bytes": 3807
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=2304,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=2304,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "96523a3d69520e041ffa8b930d790560ea12cfdbb76f3925c01b59618fdf5953",
       "bytes": 3807
     },
@@ -39499,12 +39544,12 @@
       "bytes": 3802
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=24576,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=24576,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "46737b95fbb5e4213ee32c0c8c06c4cfcc1657be3700ffb516ae54fe3f0441e2",
       "bytes": 3812
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=24576,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=24576,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "46737b95fbb5e4213ee32c0c8c06c4cfcc1657be3700ffb516ae54fe3f0441e2",
       "bytes": 3812
     },
@@ -39559,12 +39604,12 @@
       "bytes": 3800
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=256,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=256,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "89cb30a91614b1476840caefe1822a3b8e861bd0737a99812669d3adef7e5635",
       "bytes": 3800
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=256,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=256,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "89cb30a91614b1476840caefe1822a3b8e861bd0737a99812669d3adef7e5635",
       "bytes": 3800
     },
@@ -39599,12 +39644,12 @@
       "bytes": 3803
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=3072,K=1536,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=3072,K=1536,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "3fca7e75966dfc3eb51ba9373e051eb45d35c734d19820c9027a8222c4835bc2",
       "bytes": 3805
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=3072,K=1536,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=3072,K=1536,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "3fca7e75966dfc3eb51ba9373e051eb45d35c734d19820c9027a8222c4835bc2",
       "bytes": 3805
     },
@@ -39634,12 +39679,12 @@
       "bytes": 3802
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=3072,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=3072,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "6fafdb854b90ac8f4762fbf0980bd4621e2fd4667cc34b230293a6c2e8ffb7c6",
       "bytes": 3806
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=3072,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=3072,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "6fafdb854b90ac8f4762fbf0980bd4621e2fd4667cc34b230293a6c2e8ffb7c6",
       "bytes": 3806
     },
@@ -39674,12 +39719,12 @@
       "bytes": 3802
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=32768,K=512,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=32768,K=512,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "278497c29b22a0145d4d739a8f63a3add36b12e5b5345e3770b76ceb9516cc26",
       "bytes": 3808
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=32768,K=512,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=32768,K=512,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "278497c29b22a0145d4d739a8f63a3add36b12e5b5345e3770b76ceb9516cc26",
       "bytes": 3808
     },
@@ -39734,12 +39779,12 @@
       "bytes": 3813
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=36864,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=36864,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "013db2acca13be6a22ce2e2cc702ed8942d9e7b3f508184a1a0f7ee86c67b9ce",
       "bytes": 3819
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=36864,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=36864,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "013db2acca13be6a22ce2e2cc702ed8942d9e7b3f508184a1a0f7ee86c67b9ce",
       "bytes": 3819
     },
@@ -39759,12 +39804,12 @@
       "bytes": 3811
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=4096,K=512,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=4096,K=512,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "7286edfd9851dddb760b24abd766c63d5c27d684bdf18bc62dd221f47f010d0d",
       "bytes": 3801
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=4096,K=512,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=4096,K=512,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "7286edfd9851dddb760b24abd766c63d5c27d684bdf18bc62dd221f47f010d0d",
       "bytes": 3801
     },
@@ -39809,12 +39854,12 @@
       "bytes": 3802
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=4608,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=4608,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "7d040324c94b758b18e42a2c8391e4473beb2786ac8d099cd161a0a03e1b0b6d",
       "bytes": 3810
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=4608,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=4608,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "7d040324c94b758b18e42a2c8391e4473beb2786ac8d099cd161a0a03e1b0b6d",
       "bytes": 3810
     },
@@ -39849,12 +39894,12 @@
       "bytes": 3802
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=512,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=512,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "75c3c76d811bcfc4fd48ce7e6b9b0ffcafe7a439211fbbb428cf5a88b9fd7ac1",
       "bytes": 3806
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=512,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=512,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "75c3c76d811bcfc4fd48ce7e6b9b0ffcafe7a439211fbbb428cf5a88b9fd7ac1",
       "bytes": 3806
     },
@@ -39899,12 +39944,12 @@
       "bytes": 3800
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=576,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=576,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "fa8f50aaa410fbd911542b83394181b8a5c74537746ac193ceb0dc1c619824b4",
       "bytes": 3799
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=576,K=7168,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=576,K=7168,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "fa8f50aaa410fbd911542b83394181b8a5c74537746ac193ceb0dc1c619824b4",
       "bytes": 3799
     },
@@ -39959,12 +40004,12 @@
       "bytes": 3794
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=1024,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=1024,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "c2fe468c6000f8dc89e354987581b7b4f020c1fe892bb65fe9269600b4397376",
       "bytes": 3806
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=1024,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=1024,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "c2fe468c6000f8dc89e354987581b7b4f020c1fe892bb65fe9269600b4397376",
       "bytes": 3806
     },
@@ -40004,12 +40049,12 @@
       "bytes": 3799
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=1152,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=1152,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "00ebb4e5d6b62d96c2cc3f522acae09f31fe8a1dc2757b1121d25cff8275969b",
       "bytes": 3807
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=1152,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=1152,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "00ebb4e5d6b62d96c2cc3f522acae09f31fe8a1dc2757b1121d25cff8275969b",
       "bytes": 3807
     },
@@ -40049,12 +40094,12 @@
       "bytes": 3809
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=128,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=128,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "078b84c2e7edbda8fd80719da03067561c5b3519b352dceee0b1f4bbe3bbbe80",
       "bytes": 3804
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=128,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=128,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "078b84c2e7edbda8fd80719da03067561c5b3519b352dceee0b1f4bbe3bbbe80",
       "bytes": 3804
     },
@@ -40089,12 +40134,12 @@
       "bytes": 3803
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=16384,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=16384,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "b1c7cedff9dc0adcaba9c6129c8a0065331fbc1ce3078a3fd3f6dd8a2552361e",
       "bytes": 3803
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=16384,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=16384,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "b1c7cedff9dc0adcaba9c6129c8a0065331fbc1ce3078a3fd3f6dd8a2552361e",
       "bytes": 3803
     },
@@ -40149,12 +40194,12 @@
       "bytes": 3804
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=18432,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=18432,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "e89a36870da0429ca2368091669188b6ee0c064632b73756f958205940b87cf1",
       "bytes": 3804
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=18432,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=18432,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "e89a36870da0429ca2368091669188b6ee0c064632b73756f958205940b87cf1",
       "bytes": 3804
     },
@@ -40209,12 +40254,12 @@
       "bytes": 3797
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=2048,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=2048,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "536d10e09c06eb7914fba71cdb8d551c67697adb4259b057449f4467e7db92a0",
       "bytes": 3803
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=2048,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=2048,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "536d10e09c06eb7914fba71cdb8d551c67697adb4259b057449f4467e7db92a0",
       "bytes": 3803
     },
@@ -40249,12 +40294,12 @@
       "bytes": 3802
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=2304,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=2304,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "39366ddde965d0e67b0a0e4bd7b2b634f5385306b20244e2855e478d4994880c",
       "bytes": 3810
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=2304,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=2304,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "39366ddde965d0e67b0a0e4bd7b2b634f5385306b20244e2855e478d4994880c",
       "bytes": 3810
     },
@@ -40289,12 +40334,12 @@
       "bytes": 3805
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=256,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=256,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "c4c1a6a0dd994e32900594be93be661533e90046cf477932330a9956d81b1223",
       "bytes": 3802
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=256,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=256,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "c4c1a6a0dd994e32900594be93be661533e90046cf477932330a9956d81b1223",
       "bytes": 3802
     },
@@ -40324,12 +40369,12 @@
       "bytes": 3804
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=8192,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=8192,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "56d4063b77c48b285b286e2c974edcb9573a89dd84b4a795d39a332e637f10d4",
       "bytes": 3807
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=8192,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=7168,K=8192,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "56d4063b77c48b285b286e2c974edcb9573a89dd84b4a795d39a332e637f10d4",
       "bytes": 3807
     },
@@ -40339,12 +40384,12 @@
       "bytes": 3796
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=8192,K=1536,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=8192,K=1536,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "1c8a1649480039c35a2b6923d98c038c36b6dcfcd05534f60b678f5bdf393afc",
       "bytes": 3805
     },
     {
-      "path": "vllm/model_executor/layers/quantization/utils/configs/N=8192,K=1536,device_name=AMD_Instinct_MI325X,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "path": "vllm/model_executor/layers/quantization/utils/configs/N=8192,K=1536,device_name=AMD_Instinct_MI325_OAM,dtype=fp8_w8a8,block_shape=[128,128].json",
       "sha256": "1c8a1649480039c35a2b6923d98c038c36b6dcfcd05534f60b678f5bdf393afc",
       "bytes": 3805
     },
@@ -40749,6 +40794,11 @@
       "bytes": 65986
     },
     {
+      "path": "vllm/model_executor/models/AXK1.py",
+      "sha256": "d1cae71fedd8bd8bf05aa37b780a5db6b4adbb864d0ab3ab8f35d1510c6751d0",
+      "bytes": 45850
+    },
+    {
       "path": "vllm/model_executor/models/__init__.py",
       "sha256": "49334ac1e9d4683be887c15bd264977bff09afb862ebea1bba45bd3279b36e53",
       "bytes": 1141
@@ -40787,11 +40837,6 @@
       "path": "vllm/model_executor/models/audioflamingo3.py",
       "sha256": "787096847525353b0f243636ac6ccf183086c0fc2db853c092d5966cfdfd081b",
       "bytes": 24154
-    },
-    {
-      "path": "vllm/model_executor/models/AXK1.py",
-      "sha256": "d1cae71fedd8bd8bf05aa37b780a5db6b4adbb864d0ab3ab8f35d1510c6751d0",
-      "bytes": 45850
     },
     {
       "path": "vllm/model_executor/models/bagel.py",
@@ -41955,8 +42000,8 @@
     },
     {
       "path": "vllm/model_executor/models/qwen3_dflash.py",
-      "sha256": "72492690067b0905356175c7b07305fb8f0792bae0a6ba779826fdad53be5ef4",
-      "bytes": 40034
+      "sha256": "e1bf578585ce3c409ec98846afd8d26ccd7a8c44229f1764dc2f85cb4d6c8e40",
+      "bytes": 40614
     },
     {
       "path": "vllm/model_executor/models/qwen3_dflash2.py",
@@ -44229,16 +44274,6 @@
       "bytes": 15244
     },
     {
-      "path": "vllm/parser/__init__.py",
-      "sha256": "6a6283e16fde98f8c7c8b5c7da33ad8b788139e7403f40b44f186b3ee088ab9a",
-      "bytes": 380
-    },
-    {
-      "path": "vllm/parser/abstract_parser.py",
-      "sha256": "1fefadba8f059a8f6ba485ce5d34e06e674e21a2ad095df10db1c4a889467be6",
-      "bytes": 38420
-    },
-    {
       "path": "vllm/parser/AGENTS.md",
       "sha256": "13677ce1a03e857a111ecd690e9b4375997605d8102c79a01a8eb771c07b9895",
       "bytes": 2234
@@ -44247,6 +44282,16 @@
       "path": "vllm/parser/CLAUDE.md",
       "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
       "bytes": 11
+    },
+    {
+      "path": "vllm/parser/__init__.py",
+      "sha256": "6a6283e16fde98f8c7c8b5c7da33ad8b788139e7403f40b44f186b3ee088ab9a",
+      "bytes": 380
+    },
+    {
+      "path": "vllm/parser/abstract_parser.py",
+      "sha256": "1fefadba8f059a8f6ba485ce5d34e06e674e21a2ad095df10db1c4a889467be6",
+      "bytes": 38420
     },
     {
       "path": "vllm/parser/cohere_command.py",
@@ -44524,6 +44569,16 @@
       "bytes": 4194
     },
     {
+      "path": "vllm/reasoning/AGENTS.md",
+      "sha256": "ac39251363017c19ba36138546e2b2dfbb196be66d3b2db564075432d4236482",
+      "bytes": 3079
+    },
+    {
+      "path": "vllm/reasoning/CLAUDE.md",
+      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+      "bytes": 11
+    },
+    {
       "path": "vllm/reasoning/__init__.py",
       "sha256": "4406ac938655e6cc7282de26c7ae2431e07b9c9156e8ce008dfc3735bc00c624",
       "bytes": 4518
@@ -44534,19 +44589,9 @@
       "bytes": 12904
     },
     {
-      "path": "vllm/reasoning/AGENTS.md",
-      "sha256": "ac39251363017c19ba36138546e2b2dfbb196be66d3b2db564075432d4236482",
-      "bytes": 3079
-    },
-    {
       "path": "vllm/reasoning/basic_parsers.py",
       "sha256": "c2987742a21ac999c5b0b6ebf655c5e038c15bb49bed7a5886ad9d0040ea0391",
       "bytes": 7770
-    },
-    {
-      "path": "vllm/reasoning/CLAUDE.md",
-      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
-      "bytes": 11
     },
     {
       "path": "vllm/reasoning/cohere_command_reasoning_parser.py",
@@ -44864,14 +44909,14 @@
       "bytes": 0
     },
     {
-      "path": "vllm/third_party/flash_linear_attention/__init__.py",
-      "sha256": "5dbbfa3fc286edb2e970e175ef33cee4f6181c89b0784f5a8986201b2312f54e",
-      "bytes": 391
-    },
-    {
       "path": "vllm/third_party/flash_linear_attention/LICENSE",
       "sha256": "1350bfbef13ce4d3d3bdaa2f1fc4b1d1117d846732a2a62f891a67f3d5356d0d",
       "bytes": 1085
+    },
+    {
+      "path": "vllm/third_party/flash_linear_attention/__init__.py",
+      "sha256": "5dbbfa3fc286edb2e970e175ef33cee4f6181c89b0784f5a8986201b2312f54e",
+      "bytes": 391
     },
     {
       "path": "vllm/third_party/flash_linear_attention/ops/__init__.py",
@@ -45049,6 +45094,16 @@
       "bytes": 11883
     },
     {
+      "path": "vllm/tool_parsers/AGENTS.md",
+      "sha256": "44c941ca7740f85ae76540a8a62bf706d3d7cc28af5bad5a481762f40aad7483",
+      "bytes": 2595
+    },
+    {
+      "path": "vllm/tool_parsers/CLAUDE.md",
+      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+      "bytes": 11
+    },
+    {
       "path": "vllm/tool_parsers/__init__.py",
       "sha256": "dce4b4d6c68f3b3a0ec4ed6ae9dc5b07b55d1ce004530bc2d958a25170ff71a5",
       "bytes": 5447
@@ -45059,19 +45114,9 @@
       "bytes": 13474
     },
     {
-      "path": "vllm/tool_parsers/AGENTS.md",
-      "sha256": "44c941ca7740f85ae76540a8a62bf706d3d7cc28af5bad5a481762f40aad7483",
-      "bytes": 2595
-    },
-    {
       "path": "vllm/tool_parsers/apertus_tool_parser.py",
       "sha256": "902e6a6c77428926f5b3dd234b788ca55ce0f17d846818089145b2d8c946b626",
       "bytes": 20662
-    },
-    {
-      "path": "vllm/tool_parsers/CLAUDE.md",
-      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
-      "bytes": 11
     },
     {
       "path": "vllm/tool_parsers/cohere_command_tool_parser.py",
@@ -45404,6 +45449,11 @@
       "bytes": 523
     },
     {
+      "path": "vllm/transformers_utils/configs/AXK1.py",
+      "sha256": "7cccdaaff1ecdee4a2faad599716884747f8f20c0b27b175323ace16098a19ab",
+      "bytes": 10992
+    },
+    {
       "path": "vllm/transformers_utils/configs/__init__.py",
       "sha256": "822833136b92ef5bd185b1319c8e9f69b43cef1f673d0fc407269e75287e0d66",
       "bytes": 9522
@@ -45412,11 +45462,6 @@
       "path": "vllm/transformers_utils/configs/afmoe.py",
       "sha256": "1b39e96f5599e8646a870651011517c381ffd992a790b1833d9a29097d1fe9f1",
       "bytes": 3212
-    },
-    {
-      "path": "vllm/transformers_utils/configs/AXK1.py",
-      "sha256": "7cccdaaff1ecdee4a2faad599716884747f8f20c0b27b175323ace16098a19ab",
-      "bytes": 10992
     },
     {
       "path": "vllm/transformers_utils/configs/bagel.py",
@@ -46230,8 +46275,8 @@
     },
     {
       "path": "vllm/v1/attention/backends/flash_attn.py",
-      "sha256": "551758f5129d1ccf026f1ecf53cb8c28765f2ba3155e9853103404161ae974d5",
-      "bytes": 91859
+      "sha256": "89cca890fb03ae3e24de87cad8a5d170bbf83ea5388f28189d991fccb5e9ebbb",
+      "bytes": 92811
     },
     {
       "path": "vllm/v1/attention/backends/flash_attn_diffkv.py",
@@ -46500,8 +46545,8 @@
     },
     {
       "path": "vllm/v1/attention/backends/triton_attn.py",
-      "sha256": "8705ce4e76b9482c9af2252c8ea597becff389a770880128fcd319d9ec045bb2",
-      "bytes": 48355
+      "sha256": "9d5a64977870c257492ae1b0efe7e38a16208a6ee64f0d96207e6e104f897b62",
+      "bytes": 48610
     },
     {
       "path": "vllm/v1/attention/backends/triton_attn_diffkv.py",
@@ -46635,8 +46680,8 @@
     },
     {
       "path": "vllm/v1/attention/ops/qwen031/o2.py",
-      "sha256": "a128b6ce4355ab02f2e39815cf679a60071aa8c57e4fc8b2a4f60d8029aeb63d",
-      "bytes": 5262
+      "sha256": "22abf234c9a89df7e68f791a79ea65be585a7d3fc7d4b3288746d9f3e2bdad2a",
+      "bytes": 5493
     },
     {
       "path": "vllm/v1/attention/ops/qwen031/o2_kernels.py",
@@ -46645,18 +46690,18 @@
     },
     {
       "path": "vllm/v1/attention/ops/qwen031/o5.py",
-      "sha256": "e37390d918177f8d2e1cf8d2d6ded4323683ea0b3b46b65117c500b88f5fd9d4",
-      "bytes": 5880
+      "sha256": "e33aecdeb00b3b8405d2cd4d27b3e796cd1a95d0a824fe91da8b22af2c2a1ec7",
+      "bytes": 5977
     },
     {
       "path": "vllm/v1/attention/ops/qwen031/o5_kernels.py",
-      "sha256": "e3976f25cf8c4cc124d02420966ccc1b0e1c8612d392abb3016512f8394f3469",
-      "bytes": 5312
+      "sha256": "95f3ce27cb448fee294e53609c1b4f91bd13fb456a4f4c85588d47f4930380a2",
+      "bytes": 5383
     },
     {
       "path": "vllm/v1/attention/ops/qwen031/pf2.py",
-      "sha256": "74fa129e9fa40aa4768ec794180188338fd86fef6ea8cc8ea0ce6bf652d266ce",
-      "bytes": 5496
+      "sha256": "1748890faa96f6f46d5cc9f0bd085d2b138a63452bdf0cab08d2f30968275593",
+      "bytes": 6187
     },
     {
       "path": "vllm/v1/attention/ops/rocm_aiter_mla_merge.py",
@@ -47110,8 +47155,8 @@
     },
     {
       "path": "vllm/v1/kv_offload/cpu/qwen_o4.py",
-      "sha256": "a0b72393a028bf01c210e5705b5e0348070cc8789dc96cf6dd4311c7a15c7dda",
-      "bytes": 30721
+      "sha256": "c5426ce28f182d31b904d922f5d228e15a448198a491151fe65b812d2e0224c8",
+      "bytes": 31576
     },
     {
       "path": "vllm/v1/kv_offload/cpu/qwen_o4_layout.py",
@@ -47759,6 +47804,11 @@
       "bytes": 4540
     },
     {
+      "path": "vllm/v1/worker/gpu/README.md",
+      "sha256": "d47fdf9c7a4cbace5cf79bcd5d65f9f91cb1dd4910891c18fdbe560ddd03f16c",
+      "bytes": 181
+    },
+    {
       "path": "vllm/v1/worker/gpu/__init__.py",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0
@@ -47929,11 +47979,6 @@
       "bytes": 11966
     },
     {
-      "path": "vllm/v1/worker/gpu/README.md",
-      "sha256": "d47fdf9c7a4cbace5cf79bcd5d65f9f91cb1dd4910891c18fdbe560ddd03f16c",
-      "bytes": 181
-    },
-    {
       "path": "vllm/v1/worker/gpu/sample/__init__.py",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0
@@ -48075,8 +48120,8 @@
     },
     {
       "path": "vllm/v1/worker/gpu/spec_decode/dflash/utils.py",
-      "sha256": "f0584417149c0a6fa67e700b2a725e40a41f4546a806b26e6cc64b64c59cfd66",
-      "bytes": 2924
+      "sha256": "e9cbe16ffa8efc1f43f37830a7a7e8532b09c98e3e057c89bd4843b02ec55d11",
+      "bytes": 3709
     },
     {
       "path": "vllm/v1/worker/gpu/spec_decode/dflash2/__init__.py",
@@ -48334,7 +48379,7 @@
       "bytes": 27615
     }
   ],
-  "note": "54 upstream patches, three port patches, six final overlay files. Public source uses canonical LF; raw tested SHA values are retained in normalization. Two review patches describe the final delta and are not applied twice.",
+  "note": "54 upstream patches, three original TP2 port patches, fifteen final overlay files. TP1/TP2/TP4 prefill routes share bounded storage while retaining shape/stream isolation. Attention scratch is prepared at model load. Draft shared-head meta initialization is opt-in. Canonical LF and original tested hashes are retained; merged GPU validation is pending.",
   "normalization": {
     "policy": "UTF-8 text CRLF to LF only; binary files unchanged",
     "raw_tested_hashes_before_LF": {
@@ -57400,5 +57445,98 @@
     },
     "input_acceptance": "Both CRLF and LF are accepted only if their canonical text SHA matches; input is never modified",
     "numerical_source_changes": false
+  },
+  "tp4_extension": {
+    "profile": "quad-3090",
+    "main_local_heads": [
+      6,
+      1
+    ],
+    "preserved_tp2_local_heads": [
+      12,
+      2
+    ],
+    "gpu_validation": "pending; see docs/qwenrelay-tp4-validation.md"
+  },
+  "tp1_integration": {
+    "date": "2026-10-20",
+    "source": "Reviewed TP1 candidate v3 and frozen single-GPU F implementation",
+    "before_source_lock_sha256": "e0ba731a6435064fac00ea8cd4384b236f70e8a3601aef855e92a3b29d4496ea",
+    "changes": [
+      {
+        "path": "vllm/model_executor/models/qwen3_dflash.py",
+        "before_sha256": "72492690067b0905356175c7b07305fb8f0792bae0a6ba779826fdad53be5ef4",
+        "after_sha256": "e1bf578585ce3c409ec98846afd8d26ccd7a8c44229f1764dc2f85cb4d6c8e40",
+        "before_bytes": 40034,
+        "after_bytes": 40614
+      },
+      {
+        "path": "vllm/v1/attention/backends/flash_attn.py",
+        "before_sha256": "551758f5129d1ccf026f1ecf53cb8c28765f2ba3155e9853103404161ae974d5",
+        "after_sha256": "89cca890fb03ae3e24de87cad8a5d170bbf83ea5388f28189d991fccb5e9ebbb",
+        "before_bytes": 91859,
+        "after_bytes": 92811
+      },
+      {
+        "path": "vllm/v1/attention/backends/triton_attn.py",
+        "before_sha256": "8705ce4e76b9482c9af2252c8ea597becff389a770880128fcd319d9ec045bb2",
+        "after_sha256": "9d5a64977870c257492ae1b0efe7e38a16208a6ee64f0d96207e6e104f897b62",
+        "before_bytes": 48355,
+        "after_bytes": 48610
+      },
+      {
+        "path": "vllm/v1/attention/ops/qwen031/o2.py",
+        "before_sha256": "cb4cfc7e19036d217e680487b6fd956f954d3ac691aa2041eda692b3e0d811f2",
+        "after_sha256": "22abf234c9a89df7e68f791a79ea65be585a7d3fc7d4b3288746d9f3e2bdad2a",
+        "before_bytes": 5323,
+        "after_bytes": 5493
+      },
+      {
+        "path": "vllm/v1/attention/ops/qwen031/o5.py",
+        "before_sha256": "b0e648b5a3849eb636948c972b23d31cc08994091919c8bf5e74bf5525c0aa49",
+        "after_sha256": "e33aecdeb00b3b8405d2cd4d27b3e796cd1a95d0a824fe91da8b22af2c2a1ec7",
+        "before_bytes": 5937,
+        "after_bytes": 5977
+      },
+      {
+        "path": "vllm/v1/attention/ops/qwen031/o5_kernels.py",
+        "before_sha256": "71acb0d0986ca238f913379568b5f703b8e8f6dcb4f2b265ab252360c424ca1d",
+        "after_sha256": "95f3ce27cb448fee294e53609c1b4f91bd13fb456a4f4c85588d47f4930380a2",
+        "before_bytes": 5331,
+        "after_bytes": 5383
+      },
+      {
+        "path": "vllm/v1/attention/ops/qwen031/pf2.py",
+        "before_sha256": "3f53172f84caddca3f69ab5e9f2b0487b2057724866dd7587aad8e4ee2e36221",
+        "after_sha256": "1748890faa96f6f46d5cc9f0bd085d2b138a63452bdf0cab08d2f30968275593",
+        "before_bytes": 5740,
+        "after_bytes": 6187
+      },
+      {
+        "path": "vllm/v1/worker/gpu/spec_decode/dflash/utils.py",
+        "before_sha256": "f0584417149c0a6fa67e700b2a725e40a41f4546a806b26e6cc64b64c59cfd66",
+        "after_sha256": "e9cbe16ffa8efc1f43f37830a7a7e8532b09c98e3e057c89bd4843b02ec55d11",
+        "before_bytes": 2924,
+        "after_bytes": 3709
+      }
+    ],
+    "geometry_Q_KV": [
+      [
+        24,
+        4
+      ],
+      [
+        12,
+        2
+      ],
+      [
+        6,
+        1
+      ]
+    ],
+    "workspace_budget_bytes": 335544320,
+    "scratch_allocation": "At model load, using scheduler max_num_seqs; unchanged attention kernels",
+    "shared_draft_head": "Meta initialization opt-in only for the TP1 profile; real target alias and no meta parameters required before inference",
+    "merged_GPU_validation": "pending; previous TP1/TP2/TP4 results apply to their recorded source versions only"
   }
 }

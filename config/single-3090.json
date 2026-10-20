@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "profile": "single-rtx3090-tp1-autoround-fast-experimental",
+  "options": {
+    "tensor-parallel-size": 1,
+    "dtype": "bfloat16",
+    "gpu-memory-utilization": 0.93,
+    "max-model-len": 132096,
+    "max-num-seqs": 4,
+    "api-server-count": 1,
+    "language-model-only": true,
+    "attention-backend": "TRITON_ATTN",
+    "kv-cache-dtype": "int8_per_token_head",
+    "mamba-ssm-cache-dtype": "float16",
+    "async-scheduling": true,
+    "max-num-batched-tokens": 2048,
+    "reasoning-parser": "qwen3",
+    "enable-prompt-tokens-details": true,
+    "enable-auto-tool-choice": true,
+    "tool-call-parser": "qwen3_coder",
+    "tool-strict-level": "parameter",
+    "prefix-cache-retention-interval": 20800,
+    "enable-prefix-caching": true,
+    "mamba-cache-mode": "align",
+    "kv-cache-memory": 6442450944,
+    "kv-offloading-size": 32,
+    "seed": 20261017,
+    "sse-keep-alive-interval": 30
+  },
+  "speculative_config": {
+    "method": "dflash",
+    "num_speculative_tokens": 4,
+    "draft_sample_method": "probabilistic",
+    "draft_tensor_parallel_size": 1
+  },
+  "compilation_config": {
+    "max_cudagraph_capture_size": 20,
+    "custom_ops": [
+      "+rms_norm",
+      "+silu_and_mul"
+    ]
+  },
+  "environment": {
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1",
+    "VLLM_NO_USAGE_STATS": "1",
+    "DO_NOT_TRACK": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0",
+    "VLLM_PLUGINS": "",
+    "VLLM_USE_FLASHINFER_SAMPLER": "0",
+    "VLLM_USE_V2_MODEL_RUNNER": "1",
+    "VLLM_SPEC_DECODE_ATTN": "1",
+    "VLLM_SPEC_DECODE_ATTN_QMAX": "5",
+    "VLLM_DFLASH2_LOOKUP": "1",
+    "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:False",
+    "VLLM_INT8_KV_PAD16": "1",
+    "VLLM_KV_PROMOTE_ALIGN_PRIMARY": "1",
+    "QWEN_PF2": "1",
+    "QWEN_O2": "1",
+    "QWEN_O5": "1",
+    "QWEN_O4": "1",
+    "QWEN_O4_COMPILE_RETENTION_NEUTRAL": "1",
+    "QWEN_O4_REFERENCE_TOKENS": "32768",
+    "QWEN_DFLASH_SHARED_HEAD_META": "1",
+    "FLASHINFER_DISABLE_VERSION_CHECK": "1"
+  },
+  "experimental": true,
+  "models_lock": "models-tp1.json"
+}

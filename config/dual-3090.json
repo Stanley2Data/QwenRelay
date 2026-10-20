@@ -34,7 +34,10 @@
   },
   "compilation_config": {
     "max_cudagraph_capture_size": 20,
-    "custom_ops": ["+rms_norm", "+silu_and_mul"]
+    "custom_ops": [
+      "+rms_norm",
+      "+silu_and_mul"
+    ]
   },
   "environment": {
     "HF_HUB_OFFLINE": "1",
@@ -58,6 +61,7 @@
     "QWEN_O5": "1",
     "QWEN_O4": "1",
     "QWEN_O4_COMPILE_RETENTION_NEUTRAL": "1",
-    "QWEN_O4_REFERENCE_TOKENS": "32768"
+    "QWEN_O4_REFERENCE_TOKENS": "32768",
+    "QWEN_DFLASH_SHARED_HEAD_META": "0"
   }
 }

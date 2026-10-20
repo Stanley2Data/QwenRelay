@@ -1,6 +1,6 @@
 # Contributing
 
-The first supported profile is dual RTX 3090 TP2. Keep single-card experiments and other model weights as separate, explicitly validated profiles.
+The default launch profile is single RTX 3090 TP1 / AutoRound-fast. TP2 and TP4 select EfficientThink through separate model locks and resource profiles. Preserve all three geometries and keep the validation evidence for each source version explicit; selecting a default does not establish GPU validation.
 
 For a source change, preserve upstream headers, explain the affected shapes/guards, and update before/after identities rather than weakening hash checks. A vLLM bump requires rebuilding and reviewing the entire inherited patch stack. Do not regenerate locks from an unexplained working tree.
 

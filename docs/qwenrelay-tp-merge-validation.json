@@ -1,0 +1,271 @@
+{
+  "date": "2026-10-20",
+  "source_lock_sha256": "242bfe3423ac76e66eafdb932903731ca3d6d3de403aa950f587dd2316ea43bc",
+  "offline_reconstruction": {
+    "passed": true,
+    "source_files": 3208,
+    "inherited_patches": 54,
+    "local_base_patches": 3,
+    "final_overlays": 15
+  },
+  "unchanged_compute_function_ASTs": [
+    "vllm/v1/attention/backends/flash_attn.py::_spec_attn_run",
+    "vllm/v1/attention/backends/flash_attn.py::_spec_attn_run_fp8",
+    "vllm/v1/attention/backends/flash_attn.py::_spec_attn_qmax",
+    "vllm/v1/attention/ops/qwen031/pf2.py::gather",
+    "vllm/v1/attention/ops/qwen031/pf2.py::attention",
+    "vllm/v1/attention/ops/qwen031/o2.py::control",
+    "vllm/v1/attention/ops/qwen031/o2.py::real_probe",
+    "vllm/v1/attention/ops/qwen031/o5_kernels.py::attention_bf16",
+    "vllm/v1/attention/ops/qwen031/o5_kernels.py::attention_int8"
+  ],
+  "launch_plans": [
+    {
+      "flags": [],
+      "tp": 1,
+      "profile": "single-3090",
+      "models_lock": "models-tp1.json",
+      "CUDA_VISIBLE_DEVICES": "0"
+    },
+    {
+      "flags": [
+        "--tp",
+        "1"
+      ],
+      "tp": 1,
+      "profile": "single-3090",
+      "models_lock": "models-tp1.json",
+      "CUDA_VISIBLE_DEVICES": "0"
+    },
+    {
+      "flags": [
+        "--tp",
+        "2"
+      ],
+      "tp": 2,
+      "profile": "dual-3090",
+      "models_lock": "models.json",
+      "CUDA_VISIBLE_DEVICES": "0,1"
+    },
+    {
+      "flags": [
+        "--tp",
+        "4"
+      ],
+      "tp": 4,
+      "profile": "quad-3090",
+      "models_lock": "models.json",
+      "CUDA_VISIBLE_DEVICES": "0,1,2,3"
+    },
+    {
+      "flags": [
+        "--profile",
+        "quad-3090"
+      ],
+      "tp": 4,
+      "profile": "quad-3090",
+      "models_lock": "models.json",
+      "CUDA_VISIBLE_DEVICES": "0,1,2,3"
+    }
+  ],
+  "invalid_selectors_rejected": 3,
+  "local_markdown_links": "passed",
+  "review_patch": "patches/qwenrelay/review/0006-tp1-capacity-and-bounded-prefill.patch",
+  "review_patch_sha256": "866fa981588366847848d9b5ea9f47f9ee124a4a8232d6ae7902255867af72f1",
+  "GPU_executed": false,
+  "full_weight_preparation_executed": false,
+  "cpu_unittest": {
+    "passed": true,
+    "tests": 22,
+    "GPU_kernels_executed": false,
+    "model_weights_used": false
+  },
+  "check_pack": {
+    "passed": true
+  },
+  "git_diff_check": {
+    "scope": "staged changes, including new overlays",
+    "result": "one inherited whitespace warning",
+    "path": "extensions/final/vllm/v1/kv_offload/cpu/qwen_o4.py",
+    "detail": "Blank line at EOF retained to preserve the locked historical source bytes; no functional source change."
+  },
+  "start_script_bash_syntax": "passed",
+  "TP1_public_primary_provenance": {
+    "direct_files_matched": 17,
+    "files": [
+      {
+        "path": "chat_template.jinja",
+        "method": "downloaded_small_file_SHA256"
+      },
+      {
+        "path": "config.json",
+        "method": "downloaded_small_file_SHA256"
+      },
+      {
+        "path": "draft_vocab_ids.json",
+        "method": "downloaded_small_file_SHA256"
+      },
+      {
+        "path": "generation_config.json",
+        "method": "downloaded_small_file_SHA256"
+      },
+      {
+        "path": "model-00001-of-00007.safetensors",
+        "method": "public_LFS_SHA256_metadata"
+      },
+      {
+        "path": "model-00002-of-00007.safetensors",
+        "method": "public_LFS_SHA256_metadata"
+      },
+      {
+        "path": "model-00003-of-00007.safetensors",
+        "method": "public_LFS_SHA256_metadata"
+      },
+      {
+        "path": "model-00004-of-00007.safetensors",
+        "method": "public_LFS_SHA256_metadata"
+      },
+      {
+        "path": "model-00005-of-00007.safetensors",
+        "method": "public_LFS_SHA256_metadata"
+      },
+      {
+        "path": "model-00007-of-00007.safetensors",
+        "method": "public_LFS_SHA256_metadata"
+      },
+      {
+        "path": "model.safetensors.index.json",
+        "method": "downloaded_small_file_SHA256"
+      },
+      {
+        "path": "model_extra_tensors.safetensors",
+        "method": "public_LFS_SHA256_metadata"
+      },
+      {
+        "path": "mtp_draft_vocab_ids.pt",
+        "method": "public_LFS_SHA256_metadata"
+      },
+      {
+        "path": "processor_config.json",
+        "method": "downloaded_small_file_SHA256"
+      },
+      {
+        "path": "quantization_config.json",
+        "method": "downloaded_small_file_SHA256"
+      },
+      {
+        "path": "tokenizer.json",
+        "method": "public_LFS_SHA256_metadata"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "method": "downloaded_small_file_SHA256"
+      }
+    ],
+    "generated_embedding_full_conversion": "pending",
+    "base_commit": "1f05c441c4e64ae0549de44fa9ea5a6d43610314",
+    "fast_commit": "124c14e7e8c7d2f5402933b9af368e772a9fcf0c"
+  },
+  "entry_and_asset_configuration_SHA256": {
+    "scripts/qwenrelay.py": "ddb38ad2317bf80f7a605a78172e5bfda63e332fb9fcb437e42530a8fb429aae",
+    "config/single-3090.json": "89b0d397f31b7bf8210275a171c14a22d6278068a81b0fb9008e031b2e5f2945",
+    "config/dual-3090.json": "281e1b324691d818b51ad810c09ddef9ede6e3896d275a17c3c9e13c8ce830b3",
+    "config/quad-3090.json": "e522f13520de6f712627557fcaa4ea44ca1d6e9646ac45d7ce4e2517a1b6827b",
+    "locks/models-tp1.json": "100cd504b0d267dbf7d06e5832f688612ef22f7e8f8cf71407bee9859ab892f4",
+    "locks/models.json": "35c96bcffa8fb884420fb9fb60f0e7f85a2eca94d2d75b42c017ec42972e2e7b",
+    "tests/gpu_tp_prefill.py": "4cc13f8a3856ac0db095dd0f339f3a6128b7ac23bb9db938c424d55733ee0c4a",
+    "docker-compose.yml": "ca8c0f3588e80f1fbe45303eb669ec8d3f03a449bf61ed9a9fb7a7649284b962",
+    ".env.example": "323714f15c00d43c0add927f8965ead4ccc325dfb6812a76107b333af30dbc48",
+    "tests/test_launch_overrides.py": "5aa2118b6883ee9294ba11974758a8cacda1d1bf822f18bf0c7a4b2e2c8f0e30"
+  },
+  "launch_override_checks": [
+    {
+      "arguments": [
+        "--tp",
+        "1",
+        "--max-num-seqs",
+        "2",
+        "--max-model-len",
+        "65536",
+        "--draft-tokens",
+        "6",
+        "--kv-cache-memory",
+        "5GiB",
+        "--kv-offloading-size",
+        "16"
+      ],
+      "profile": "single-3090",
+      "effective_settings": {
+        "max_num_seqs": 2,
+        "max_model_len": 65536,
+        "max_num_batched_tokens": 2048,
+        "draft_tokens": 6,
+        "gpu_kv_bytes_per_rank": 5368709120,
+        "cpu_kv_gib_per_tp_group": 16.0,
+        "logical_spec_query_tokens": 7,
+        "max_cudagraph_capture_size": 14
+      },
+      "CPU_offload_enabled": true
+    },
+    {
+      "arguments": [
+        "--tp",
+        "2",
+        "--devices",
+        "0,1",
+        "--concurrency",
+        "8",
+        "--context-length",
+        "65536",
+        "--draft-tokens",
+        "7",
+        "--max-num-batched-tokens",
+        "1024"
+      ],
+      "profile": "dual-3090",
+      "effective_settings": {
+        "max_num_seqs": 8,
+        "max_model_len": 65536,
+        "max_num_batched_tokens": 1024,
+        "draft_tokens": 7,
+        "gpu_kv_bytes_per_rank": 11184101204,
+        "cpu_kv_gib_per_tp_group": 32,
+        "logical_spec_query_tokens": 8,
+        "max_cudagraph_capture_size": 64
+      },
+      "CPU_offload_enabled": true
+    },
+    {
+      "arguments": [
+        "--tp",
+        "4",
+        "--max-num-seqs",
+        "2",
+        "--draft-tokens",
+        "3",
+        "--kv-offloading-size",
+        "0"
+      ],
+      "profile": "quad-3090",
+      "effective_settings": {
+        "max_num_seqs": 2,
+        "max_model_len": 262144,
+        "max_num_batched_tokens": 2048,
+        "draft_tokens": 3,
+        "gpu_kv_bytes_per_rank": 15032385536,
+        "cpu_kv_gib_per_tp_group": 0,
+        "logical_spec_query_tokens": 4,
+        "max_cudagraph_capture_size": 8
+      },
+      "CPU_offload_enabled": false
+    }
+  ],
+  "invalid_tuning_CLI_combinations_rejected": 5,
+  "launch_overrides_reconstruction": {
+    "passed": true,
+    "source_files": 3208,
+    "source_lock_sha256": "242bfe3423ac76e66eafdb932903731ca3d6d3de403aa950f587dd2316ea43bc",
+    "upstream_patch_count": 54,
+    "gpu_or_model_executed": false
+  }
+}

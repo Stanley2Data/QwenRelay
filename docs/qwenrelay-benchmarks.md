@@ -10,6 +10,8 @@ Two RTX 3090 24 GB GPUs, 350 W limits, NVIDIA 580.126.20; vLLM 0.31.0, torch 2.1
 
 The standalone profile explicitly retains the inherited DFlash2 long-context launcher defaults: `VLLM_SPEC_DECODE_ATTN=1`, `VLLM_SPEC_DECODE_ATTN_QMAX=5`, and `VLLM_DFLASH2_LOOKUP=1`. Without the first switch, speculative verification bypasses the split-KV attention implementation even when its source patches are installed. Matching source and model hashes alone does not establish an equivalent running configuration.
 
+See [DFlash launch settings](qwenrelay-install.md#dflash-launch-settings) for the per-request QMAX meaning, environment precedence, custom systemd configuration and launch-plan checks.
+
 The recorded comparison disclosed a common filesystem-path adapter for shared CPU backing and external non-numerical observation hooks. This source package preserves the original native shared-memory default and omits private test-orchestration hooks. It has not repeated the benchmark in a new container. Changing the model or profile invalidates direct comparison with these numbers.
 
 Each arm completed one full unscored warm round and three formal rounds. 264 total benchmark cases including original warmups, 2,512 inference HTTP requests, 132 complete H/F actual-input pairings and 192 formal primary values were independently checked in the original evidence. This export contains sanitized numeric aggregates and each of the three primary measurements; private infrastructure paths, raw requests and operational logs are excluded.

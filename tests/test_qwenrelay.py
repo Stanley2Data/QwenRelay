@@ -16,7 +16,45 @@ class PublicSourceContracts(unittest.TestCase):
     def test_locked_pack(self):
         lock=q.check_pack()
         self.assertEqual(len(lock['final_F']),3208)
-        self.assertEqual(len(lock['final_overlay']),6)
+        self.assertEqual(len(lock['final_overlay']),15)
+
+    def test_tp_selects_complete_profile_and_assets(self):
+        self.assertEqual(q.resolve_profile(),'single-3090')
+        for tp,devices,model,kv in ((1,'0','AutoRound-fast',6*1024**3),
+                                   (2,'0,1','EfficientThink',11184101204),
+                                   (4,'0,1,2,3','EfficientThink',14*1024**3)):
+            argv,env=q.launch_plan(ROOT/'models',devices,18020,'127.0.0.1',tp=tp)
+            self.assertIn(model,argv[4])
+            self.assertEqual(int(argv[argv.index('--tensor-parallel-size')+1]),tp)
+            self.assertEqual(int(argv[argv.index('--kv-cache-memory')+1]),kv)
+            self.assertEqual(env['QWEN_DFLASH_SHARED_HEAD_META'],'1' if tp==1 else '0')
+            self.assertEqual(env['VLLM_SPEC_DECODE_ATTN'],'1')
+            self.assertEqual(env['VLLM_SPEC_DECODE_ATTN_QMAX'],'5')
+            self.assertEqual(env['VLLM_DFLASH2_LOOKUP'],'1')
+            spec=json.loads(argv[argv.index('--speculative-config')+1])
+            self.assertEqual(spec.get('draft_tensor_parallel_size',tp),tp)
+            for flag in ('QWEN_PF2','QWEN_O2','QWEN_O4','QWEN_O5'):
+                self.assertEqual(env[flag],'1')
+        default,_=q.launch_plan(ROOT/'models','0',18020,'127.0.0.1')
+        self.assertEqual(default[default.index('--max-model-len')+1],'132096')
+        with self.assertRaises(ValueError):q.launch_plan(ROOT/'models','0,1',18020,'127.0.0.1')
+        with self.assertRaises(ValueError):q.resolve_profile(1,'dual-3090')
+        with self.assertRaises(ValueError):q.resolve_profile(3)
+        self.assertEqual(q.resolve_profile(4,'quad-3090'),'quad-3090')
+
+    def test_tp4_profile_keeps_full_optimization_configuration(self):
+        argv,env=q.launch_plan(ROOT/'models','0,1,2,3',18020,'127.0.0.1','quad-3090')
+        self.assertEqual(argv[argv.index('--tensor-parallel-size')+1],'4')
+        self.assertEqual(argv[argv.index('--data-parallel-size')+1],'1')
+        self.assertEqual(int(argv[argv.index('--kv-cache-memory')+1]),14*1024**3)
+        self.assertEqual(argv[argv.index('--kv-offloading-size')+1],'32')
+        spec=json.loads(argv[argv.index('--speculative-config')+1])
+        self.assertEqual(spec['draft_tensor_parallel_size'],4)
+        for key in ('QWEN_PF2','QWEN_O2','QWEN_O4','QWEN_O5'):
+            self.assertEqual(env[key],'1')
+        with self.assertRaises(ValueError):
+            q.launch_plan(ROOT/'models','0,1',18020,'127.0.0.1','quad-3090')
+        with self.assertRaises(ValueError):q.launch_profile('../arbitrary')
 
     def test_path_traversal_and_absolute_paths(self):
         with tempfile.TemporaryDirectory() as root:
@@ -29,7 +67,7 @@ class PublicSourceContracts(unittest.TestCase):
             os.environ['VLLM_MARLIN_USE_INT8_INPUT']='1'
             os.environ['VLLM_MARLIN_INPUT_DTYPE']='int8'
             os.environ['VLLM_PREFILL_ATTN']='int8'
-            argv,env=q.launch_plan(Path(tmp),'1,2',18020,'127.0.0.1')
+            argv,env=q.launch_plan(Path(tmp),'1,2',18020,'127.0.0.1',tp=2)
         self.assertNotIn('INT8_ACT',env)
         self.assertNotIn('VLLM_MARLIN_USE_INT8_INPUT',env)
         self.assertNotIn('VLLM_MARLIN_INPUT_DTYPE',env)
@@ -50,7 +88,7 @@ class PublicSourceContracts(unittest.TestCase):
 
     def test_reject_duplicate_or_missing_gpus(self):
         for devices in ('0','0,0','0,1,2','a,b'):
-            with self.assertRaises(ValueError):q.launch_plan(ROOT/'models',devices,18020,'127.0.0.1')
+            with self.assertRaises(ValueError):q.launch_plan(ROOT/'models',devices,18020,'127.0.0.1',tp=2)
 
     def test_wrong_hash_and_existing_output_are_unchanged(self):
         with tempfile.TemporaryDirectory() as tmp:

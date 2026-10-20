@@ -1,0 +1,308 @@
+--- a/vllm/model_executor/models/qwen3_dflash.py
++++ b/vllm/model_executor/models/qwen3_dflash.py
+@@ -2,6 +2,8 @@
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ 
+ import io
++import os
++from contextlib import nullcontext
+ from collections.abc import Iterable
+ 
+ import regex as re
+@@ -810,16 +812,24 @@
+         )
+ 
+         logit_scale = getattr(self.config, "logit_scale", 1.0)
+-        self.lm_head = ParallelLMHead(
+-            self.config.draft_vocab_size,
+-            self.config.hidden_size,
+-            quant_config=(
+-                get_draft_quant_config(vllm_config)
+-                if getattr(self.config, "has_own_lm_head", False)
+-                else None
+-            ),
+-            prefix=maybe_prefix(prefix, "lm_head"),
+-        )
++        # Modified: this opt-in avoids a temporary full-vocabulary GPU head
++        # that the native DFlash loader immediately replaces with the target.
++        # The loader must verify the real target alias before inference.
++        self._qwen_shared_head_meta = (
++            os.environ.get("QWEN_DFLASH_SHARED_HEAD_META") == "1"
++            and not getattr(self.config, "has_own_lm_head", False)
++        )
++        with torch.device("meta") if self._qwen_shared_head_meta else nullcontext():
++            self.lm_head = ParallelLMHead(
++                self.config.draft_vocab_size,
++                self.config.hidden_size,
++                quant_config=(
++                    get_draft_quant_config(vllm_config)
++                    if getattr(self.config, "has_own_lm_head", False)
++                    else None
++                ),
++                prefix=maybe_prefix(prefix, "lm_head"),
++            )
+         self.logits_processor = LogitsProcessor(
+             self.config.draft_vocab_size, scale=logit_scale
+         )
+--- a/vllm/v1/attention/backends/flash_attn.py
++++ b/vllm/v1/attention/backends/flash_attn.py
+@@ -2235,6 +2235,29 @@
+     return _SPEC_ATTN_QMAX
+ 
+ 
++def _spec_attn_prepare(impl, max_reqs, device):
++    """Fix scratch capacity during model load, while scheduler config is bound.
++
++    The V2 worker calls attention later without a current VllmConfig. The old
++    lazy helper silently allocated for 256 requests in that context. Allocate
++    for the real scheduler capacity before capture; graph buffer addresses and
++    kernel math remain fixed for the life of this worker.
++    """
++    from vllm.v1.attention.ops.spec_decode_attn import SpecDecodeAttention
++
++    key = (impl.num_heads, impl.head_size, device)
++    att = _SPEC_ATTN.get(key)
++    if att is None:
++        att = SpecDecodeAttention(
++            max_reqs, impl.num_heads, impl.head_size, device,
++            qmax=_spec_attn_qmax(impl.num_heads // impl.num_kv_heads),
++        )
++        _SPEC_ATTN[key] = att
++    if att.max_num_reqs < max_reqs:
++        raise ValueError("split-KV scratch is smaller than scheduler max_num_seqs")
++    return att
++
++
+ def _spec_attn_run(impl, q, key_cache, value_cache, out, cu_seqlens_q, seqused_k, block_table, max_seqlen_q, k_scale_cache=None, v_scale_cache=None):
+     from vllm.v1.attention.ops.spec_decode_attn import SpecDecodeAttention
+ 
+--- a/vllm/v1/attention/backends/triton_attn.py
++++ b/vllm/v1/attention/backends/triton_attn.py
+@@ -43,6 +43,7 @@
+ from vllm.v1.attention.backends.flash_attn import (  # syv patch
+     _spec_attn_enabled,
+     _spec_attn_qmax,
++    _spec_attn_prepare,
+     _spec_attn_run,
+     _spec_attn_run_fp8,
+ )
+@@ -753,6 +754,11 @@
+         # and the builder allocates, unaccounted, as before.
+         vllm_config = get_current_vllm_config_or_none()
+         if vllm_config is not None and current_platform.is_cuda_alike():
++            if _spec_attn_enabled():
++                _spec_attn_prepare(
++                    self, vllm_config.scheduler_config.max_num_seqs,
++                    torch.device("cuda", torch.cuda.current_device()),
++                )
+             mq3d_scratch_acquire(
+                 mq3d_scratch_plan(vllm_config, num_heads),
+                 torch.device("cuda", torch.cuda.current_device()),
+--- a/vllm/v1/attention/ops/qwen031/o2.py
++++ b/vllm/v1/attention/ops/qwen031/o2.py
+@@ -10,6 +10,20 @@
+ logged=set()
+ control_cache={'mtime':None,'data':{'enabled':False,'label':'missing'}}
+ probed=False
++
++
++def acquire_q(key,device,heads):
++    """Reuse contiguous storage when O5 processes a subset of TP1 heads."""
++    assert heads in (6,12,24)
++    current=qc_cache.get(key)
++    if current is None or current[0].numel()<2048*heads*256:
++        qc_cache.pop(key,None);current=None
++        try:
++            qc_cache[key]=(torch.empty((2048,heads,256),device=device,dtype=torch.int8),
++                           torch.empty((2048,heads),device=device,dtype=torch.float32))
++        except torch.OutOfMemoryError:return None
++    qc,qs=qc_cache[key]
++    return qc.view(-1,heads,256),qs.view(-1,heads)
+ 
+ 
+ def control():
+@@ -75,16 +89,9 @@
+     out,k,v,ks,vs=(d[x] for x in ['out','k','v','k_scale_cache','v_scale_cache'])
+     hq,hk=q.shape[1],k.shape[2];key=pf2.workspace_key(q,k)
+     if any(k[0]==key[0] and k!=key for k in pf2.cache.keys() | qc_cache.keys()):return False
+-    try:
+-        if key not in pf2.cache:
+-            dk=torch.empty((131072,hk,256),device=q.device,dtype=torch.int8);dv=torch.empty_like(dk)
+-            dks=torch.empty((131072,hk),device=q.device,dtype=torch.float32);dvs=torch.empty_like(dks)
+-            pf2.cache[key]=(dk,dv,dks,dvs)
+-        if key not in qc_cache:
+-            qc_cache[key]=(torch.empty((2048,hq,256),device=q.device,dtype=torch.int8),
+-                           torch.empty((2048,hq),device=q.device,dtype=torch.float32))
+-    except torch.OutOfMemoryError:return False
+-    dk,dv,dks,dvs=pf2.cache[key];qc,qs=qc_cache[key]
++    arena=pf2.acquire_kv(key,q.device,131072,hk);queries=acquire_q(key,q.device,hq)
++    if arena is None or queries is None:return False
++    dk,dv,dks,dvs=arena;qc,qs=queries
+     pf2.gather[(n,hk)](k,v,ks,vs,d['block_table'],dk,dv,dks,dvs,d['seqused_k'],k.shape[1],hk,256,
+                      *k.stride()[:3],*ks.stride(),num_warps=4)
+     o2_kernels.quantize[(triton.cdiv(t,32),hq)](q,qc,qs,t,hq,*q.stride()[:2],num_warps=4)
+--- a/vllm/v1/attention/ops/qwen031/o5.py
++++ b/vllm/v1/attention/ops/qwen031/o5.py
+@@ -38,38 +38,38 @@
+  q,k=d['q'],d['k'];hq,hk=q.shape[1],k.shape[2];key=pf2.workspace_key(q,k);cap=131072 if d['max_seqlen_k']<=131072 else LIMIT
+  # Bound extra streams before allocating. Primary E2 normally uses one stream.
+  if any(k[0]==key[0] and k!=key for k in scratch.keys() | pf2.cache.keys() | o2.qc_cache.keys()):return None
++ # TP1's four KV heads reuse the same arena in two passes. TP2 and TP4
++ # retain one pass with respectively two and one KV heads.
++ pass_hk=min(hk,2);pass_hq=pass_hk*(hq//hk)
++ arena=pf2.acquire_kv(key,q.device,cap,pass_hk);queries=o2.acquire_q(key,q.device,pass_hq)
++ if arena is None or queries is None:return None
+  try:
+-  current=pf2.cache.get(key)
+-  if current is None or current[0].shape[0]<cap:
+-   # Release the old logical arena before growing on the same stream.
+-   pf2.cache.pop(key,None);current=None
+-   dk=torch.empty((cap,hk,256),device=q.device,dtype=torch.int8);dv=torch.empty_like(dk);dks=torch.empty((cap,hk),device=q.device,dtype=torch.float32);dvs=torch.empty_like(dks)
+-   pf2.cache[key]=(dk,dv,dks,dvs)
+-  if key not in o2.qc_cache:o2.qc_cache[key]=(torch.empty((QUERY_LIMIT,hq,256),device=q.device,dtype=torch.int8),torch.empty((QUERY_LIMIT,hq),device=q.device,dtype=torch.float32))
+   if key not in scratch:scratch[key]=torch.empty((4,3),device=q.device,dtype=torch.int32)
+  except torch.OutOfMemoryError:return None
+  total=sum(x.numel()*x.element_size() for x in pf2.cache[key]+o2.qc_cache[key]) + scratch[key].numel()*scratch[key].element_size()
+  assert total<=BUDGET,(total,BUDGET)
+- return key,total
++ return key,total,arena+queries
+ 
+ def try_run(d,native):
+  if not eligible(d) or torch.cuda.is_current_stream_capturing():return False
+  arena=acquire(d)
+  if arena is None:return False
+- key,total=arena;q,k,v,out,ks,vs=(d[x] for x in ['q','k','v','out','k_scale_cache','v_scale_cache']);lens,cu,bt=(d[x] for x in ['seqused_k','cu_seqlens_q','block_table']);n=d['max_seqlen_k'];c=lens.numel();mq=d['max_seqlen_q'];t=q.shape[0];hq,hk=q.shape[1],k.shape[2]
++ key,total,buffers=arena;q,k,v,out,ks,vs=(d[x] for x in ['q','k','v','out','k_scale_cache','v_scale_cache']);lens,cu,bt=(d[x] for x in ['seqused_k','cu_seqlens_q','block_table']);n=d['max_seqlen_k'];c=lens.numel();mq=d['max_seqlen_q'];t=q.shape[0];hq,hk=q.shape[1],k.shape[2]
+  # Original metadata, query offsets and native arithmetic for every decode/
+  # unsupported slice. The native kernel early-returns on optimized slices.
+  args=dict(d);args['o5_fallback_only']=True;native(**args)
+  use_int8=os.environ.get('QWEN_O2')=='1'
+- dk,dv,dks,dvs=pf2.cache[key];qc,qs=o2.qc_cache[key]
+- if use_int8:o2_kernels.quantize[(triton.cdiv(t,32),hq)](q,qc,qs,t,hq,*q.stride()[:2],num_warps=4)
+- for seq in range(c):
+-  kernels.gather_sequence[(triton.cdiv(n,32),hk)](k,v,ks,vs,bt,dk,dv,dks,dvs,lens,cu,scratch[key],seq,use_int8,k.shape[1],hk,bt.stride(0),*k.stride()[:3],*ks.stride(),num_warps=4)
+-  kernels.attention_bf16[(triton.cdiv(mq,32),hq)](q,dk,dv,dks,dvs,out,lens,cu,seq,use_int8,hq,hk,256,*q.stride()[:2],*out.stride()[:2],num_warps=4,num_stages=2)
+-  if use_int8:kernels.attention_int8[(triton.cdiv(mq,32),hq)](q,qc,qs,dk,dv,dks,dvs,out,lens,cu,seq,use_int8,hq,hk,*q.stride()[:2],*out.stride()[:2],False,num_warps=4,num_stages=2)
++ dk,dv,dks,dvs,qc,qs=buffers;pass_hk=min(hk,2);pass_hq=pass_hk*(hq//hk)
++ for head_start in range(0,hk,pass_hk):
++  qstart=head_start*(hq//hk);qp=q[:,qstart:qstart+pass_hq];op=out[:,qstart:qstart+pass_hq]
++  if use_int8:o2_kernels.quantize[(triton.cdiv(t,32),pass_hq)](qp,qc,qs,t,pass_hq,*qp.stride()[:2],num_warps=4)
++  for seq in range(c):
++   kernels.gather_sequence[(triton.cdiv(n,32),pass_hk)](k,v,ks,vs,bt,dk,dv,dks,dvs,lens,cu,scratch[key],seq,use_int8,k.shape[1],pass_hk,bt.stride(0),*k.stride()[:3],*ks.stride(),HEAD_START=head_start,num_warps=4)
++   kernels.attention_bf16[(triton.cdiv(mq,32),pass_hq)](qp,dk,dv,dks,dvs,op,lens,cu,seq,use_int8,pass_hq,pass_hk,256,*qp.stride()[:2],*op.stride()[:2],num_warps=4,num_stages=2)
++   if use_int8:kernels.attention_int8[(triton.cdiv(mq,32),pass_hq)](qp,qc,qs,dk,dv,dks,dvs,op,lens,cu,seq,use_int8,pass_hq,pass_hk,*qp.stride()[:2],*op.stride()[:2],False,num_warps=4,num_stages=2)
+  marker=(q.device.index,c,n>131072,mq>=513)
+  if marker not in logged:
+-  logged.add(marker);record={'pid':os.getpid(),'device':q.device.index,'requests':c,'total_query_tokens':t,'max_query_tokens':mq,'max_context_tokens':n,'hq':hq,'hk':hk,'arena_bytes':total,'GPU_lengths_no_CPU_sync':True}
++  logged.add(marker);record={'pid':os.getpid(),'device':q.device.index,'requests':c,'total_query_tokens':t,'max_query_tokens':mq,'max_context_tokens':n,'hq':hq,'hk':hk,'KV_heads_per_pass':pass_hk,'head_passes':hk//pass_hk,'arena_bytes':total,'GPU_lengths_no_CPU_sync':True}
+   # Optional audit performs an explicit readback, separately from timed runs.
+   trace=os.environ.get('QWEN_O5_TRACE_DIR')
+   if trace:
+--- a/vllm/v1/attention/ops/qwen031/o5_kernels.py
++++ b/vllm/v1/attention/ops/qwen031/o5_kernels.py
+@@ -3,7 +3,7 @@
+ from .o2_kernels import quantize_rows
+ 
+ @triton.jit
+-def gather_sequence(K,V,KS,VS,BT,DK,DV,DKS,DVS,L,CU,STATS,SEQ:tl.constexpr,USE_INT8:tl.constexpr,PAGE:tl.constexpr,HK:tl.constexpr,BT0:tl.constexpr,S0:tl.constexpr,S1:tl.constexpr,S2:tl.constexpr,T0:tl.constexpr,T1:tl.constexpr,T2:tl.constexpr,BLOCK:tl.constexpr=32):
++def gather_sequence(K,V,KS,VS,BT,DK,DV,DKS,DVS,L,CU,STATS,SEQ:tl.constexpr,USE_INT8:tl.constexpr,PAGE:tl.constexpr,HK:tl.constexpr,BT0:tl.constexpr,S0:tl.constexpr,S1:tl.constexpr,S2:tl.constexpr,T0:tl.constexpr,T1:tl.constexpr,T2:tl.constexpr,BLOCK:tl.constexpr=32,HEAD_START:tl.constexpr=0):
+  n=tl.load(L+SEQ);t=tl.load(CU+SEQ+1)-tl.load(CU+SEQ)
+  active=(t>=256)&(t<=2048)&(n>=t)&(n<=262144)
+  if (tl.program_id(0)==0)&(tl.program_id(1)==0):
+@@ -12,9 +12,9 @@
+  if not active:return
+  x=tl.program_id(0)*BLOCK+tl.arange(0,BLOCK);h=tl.program_id(1);d=tl.arange(0,256)
+  block=tl.load(BT+SEQ*BT0+x//PAGE,x<n,0);slot=x%PAGE
+- src=block[:,None].to(tl.int64)*S0+slot[:,None]*S1+h*S2+d[None,:];dst=(x[:,None]*HK+h)*256+d[None,:]
++ src=block[:,None].to(tl.int64)*S0+slot[:,None]*S1+(h+HEAD_START)*S2+d[None,:];dst=(x[:,None]*HK+h)*256+d[None,:]
+  tl.store(DK+dst,tl.load(K+src,x[:,None]<n,0),x[:,None]<n);tl.store(DV+dst,tl.load(V+src,x[:,None]<n,0),x[:,None]<n)
+- si=block.to(tl.int64)*T0+slot*T1+h*T2
++ si=block.to(tl.int64)*T0+slot*T1+(h+HEAD_START)*T2
+  tl.store(DKS+x*HK+h,tl.load(KS+si,x<n,0),x<n);tl.store(DVS+x*HK+h,tl.load(VS+si,x<n,0),x<n)
+ 
+ @triton.jit
+--- a/vllm/v1/attention/ops/qwen031/pf2.py
++++ b/vllm/v1/attention/ops/qwen031/pf2.py
+@@ -1,4 +1,4 @@
+-"""Bounded TP2/TP4 C1 prefill; unsupported shapes retain the vLLM path."""
++"""Bounded TP1/TP2/TP4 C1 prefill; unsupported shapes retain the vLLM path."""
+ import os,json
+ import torch
+ from vllm.triton_utils import triton,tl
+@@ -6,10 +6,25 @@
+ cache={};logged=set()
+ 
+ def supported_heads(q,k):
+- return (q.shape[1],k.shape[2]) in ((12,2),(6,1))
++ return (q.shape[1],k.shape[2]) in ((24,4),(12,2),(6,1))
+ 
+ def workspace_key(q,k):
+  return (q.device.index,torch.cuda.current_stream(q.device).cuda_stream,q.shape[1],k.shape[2])
++
++def acquire_kv(key,device,cap,heads):
++ """Share token-head storage between PF2/O2 and O5's bounded head passes."""
++ required=cap*heads
++ assert required<=524288 and heads in (1,2,4)
++ current=cache.get(key)
++ if current is None or current[0].numel()//256<required:
++  cache.pop(key,None);current=None
++  try:
++   dk=torch.empty((cap,heads,256),device=device,dtype=torch.int8);dv=torch.empty_like(dk)
++   dks=torch.empty((cap,heads),device=device,dtype=torch.float32);dvs=torch.empty_like(dks)
++   cache[key]=(dk,dv,dks,dvs)
++  except torch.OutOfMemoryError:return None
++ dk,dv,dks,dvs=cache[key]
++ return dk.view(-1,heads,256),dv.view(-1,heads,256),dks.view(-1,heads),dvs.view(-1,heads)
+ 
+ @triton.jit
+ def gather(K,V,KS,VS,BT,DK,DV,DKS,DVS,L,PAGE:tl.constexpr,H:tl.constexpr,D:tl.constexpr,S0:tl.constexpr,S1:tl.constexpr,S2:tl.constexpr,T0:tl.constexpr,T1:tl.constexpr,T2:tl.constexpr):
+@@ -67,16 +82,12 @@
+  if os.environ.get('QWEN_PF2')!='1' or not eligible(d):return False
+  if torch.cuda.is_current_stream_capturing():return False
+  q,k,v,out,ks,vs=(d[x] for x in ['q','k','v','out','k_scale_cache','v_scale_cache']);n=d['max_seqlen_k'];t=q.shape[0]
+- # One fixed bounded 130MiB workspace per device/stream; reused sequentially across layers.
++ # Shape-isolated storage: TP1 <=260MiB, TP2 <=130MiB, TP4 <=65MiB here.
+  hq,hk=q.shape[1],k.shape[2];key=workspace_key(q,k)
+  if any(k[0]==key[0] and k!=key for k in cache):return False
+- if key not in cache:
+-  try:
+-   dk=torch.empty((131072,hk,256),device=q.device,dtype=torch.int8);dv=torch.empty_like(dk)
+-   dks=torch.empty((131072,hk),device=q.device,dtype=torch.float32);dvs=torch.empty_like(dks)
+-   cache[key]=(dk,dv,dks,dvs)
+-  except torch.OutOfMemoryError:return False
+- dk,dv,dks,dvs=cache[key]
++ arena=acquire_kv(key,q.device,131072,hk)
++ if arena is None:return False
++ dk,dv,dks,dvs=arena
+  gather[(n,hk)](k,v,ks,vs,d['block_table'],dk,dv,dks,dvs,d['seqused_k'],k.shape[1],hk,256,*k.stride()[:3],*ks.stride(),num_warps=4)
+  attention[(triton.cdiv(t,32),hq)](q,dk,dv,dks,dvs,out,d['seqused_k'],t,hq,hk,256,*q.stride()[:2],*out.stride()[:2],num_warps=4,num_stages=2)
+  logkey=(key, 'long' if n>65536 else 'short')
+--- a/vllm/v1/worker/gpu/spec_decode/dflash/utils.py
++++ b/vllm/v1/worker/gpu/spec_decode/dflash/utils.py
+@@ -1,6 +1,8 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ import torch.nn as nn
++import json
++import os
+ 
+ from vllm.config import VllmConfig, replace
+ from vllm.model_executor.model_loader import get_model
+@@ -72,4 +74,17 @@
+             del dflash_model.lm_head
+         dflash_model.lm_head = target_lm_head
+ 
++    if getattr(dflash_model, "_qwen_shared_head_meta", False):
++        if (getattr(dflash_model, "has_own_lm_head", False)
++                or target_lm_head is None
++                or dflash_model.lm_head is not target_lm_head
++                or any(p.is_meta for p in dflash_model.parameters())):
++            raise RuntimeError("DFlash shared-head init requires a real target head alias and no draft-owned/meta weights")
++        print("QWEN_SHARED_HEAD_READY " + json.dumps({
++            "pid": os.getpid(), "target_head_identity_shared": True,
++            "remaining_meta_parameters": 0,
++            "head_parameter_devices": sorted({str(p.device) for p in target_lm_head.parameters()}),
++            "temporary_GPU_head_avoided": True,
++        }), flush=True)
++
+     return dflash_model
