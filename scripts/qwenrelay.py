@@ -333,6 +333,22 @@ def memory_bytes(value):
     raise ValueError('KV memory must be positive whole bytes or an IEC size such as 6GiB or 512MiB')
 
 
+def hybrid_cache_alignment(depth, retention):
+    """Match the pinned Qwen target geometry without importing CUDA.
+
+    Both locked targets have 16 K / 48 V GDN heads of dimension 128,
+    conv width 4, BF16 conv and FP16 recurrent state. INT8 KV has four
+    256-wide heads, with each K/V head padded to 272 bytes. TP divides
+    both page sizes equally, so the ratio is identical for TP1/2/4.
+    The pinned Triton backend aligns blocks to 16 tokens.
+    """
+    state_bytes=48*128*128*2
+    conv_bytes=(2*16*128+48*128)*(4-1+depth)*2
+    kv_bytes_per_token=4*2*(256+16)
+    block=16*((state_bytes+conv_bytes+16*kv_bytes_per_token-1)//(16*kv_bytes_per_token))
+    return block, math.ceil(retention/block)*block
+
+
 def effective_profile(name, overrides=None):
     """Apply explicit overrides to fresh defaults and derive coupled decode sizes."""
     overrides={} if overrides is None else dict(overrides)
@@ -375,6 +391,12 @@ def effective_profile(name, overrides=None):
                          f'({graph_tokens}); increase it or reduce concurrency/depth')
     profile['environment']['VLLM_SPEC_DECODE_ATTN_QMAX']=str(query_tokens)
     profile['compilation_config']['max_cudagraph_capture_size']=graph_tokens
+    if depth!=4:
+        # Changing depth changes conv state/page size. Keep O4 retention
+        # divisible by the actual block span, including the README examples.
+        block,retention=hybrid_cache_alignment(depth,options['prefix-cache-retention-interval'])
+        options['block-size']=block
+        options['prefix-cache-retention-interval']=retention
     return profile
 
 
@@ -394,7 +416,8 @@ def launch_plan(models_root, devices, port, host, profile_name=None, *, tp=None,
     argv=[sys.executable,'-m','vllm.entrypoints.cli.main','serve',main,
           '--served-model-name','qwenrelay','--host',host,'--port',str(port)]
     for flag,value in profile['options'].items():
-        argv.append('--'+flag)
+        # Use the full pinned vLLM spelling, not argparse prefix matching.
+        argv.append('--'+('kv-cache-memory-bytes' if flag=='kv-cache-memory' else flag))
         if value is not True:
             argv.append(str(value))
     argv += ['--speculative-config',json.dumps(spec,separators=(',',':')),
@@ -429,7 +452,9 @@ def launch(args):
                     'gpu_kv_bytes_per_rank':profile['options']['kv-cache-memory'],
                     'cpu_kv_gib_per_tp_group':profile['options'].get('kv-offloading-size',0),
                     'logical_spec_query_tokens':int(env['VLLM_SPEC_DECODE_ATTN_QMAX']),
-                    'max_cudagraph_capture_size':profile['compilation_config']['max_cudagraph_capture_size']},
+                    'max_cudagraph_capture_size':profile['compilation_config']['max_cudagraph_capture_size'],
+                    'hybrid_block_tokens':profile['options'].get('block-size',800),
+                    'prefix_cache_retention_interval':profile['options']['prefix-cache-retention-interval']},
                 'CUDA_VISIBLE_DEVICES':devices,'secret_printed':False,'model_or_GPU_started':False}
     if sys.platform != 'linux':
         raise ValueError('The RTX 3090 profiles support native Linux only')
@@ -458,7 +483,7 @@ def main():
     sub.add_parser('check-pack')
     sub.add_parser('check-runtime')
     for name in ('check-models','fetch-models'):
-        s=sub.add_parser(name);s.add_argument('--root',type=Path,default=ROOT/'models')
+        s=sub.add_parser(name);s.add_argument('--root',type=Path,default=Path(os.environ.get('MODELS_ROOT',str(ROOT/'models'))))
         s.add_argument('--tp',type=int,choices=(1,2,4))
         s.add_argument('--profile',choices=tuple(TP_PROFILES.values()))
     s=sub.add_parser('serve');s.add_argument('--models-root',type=Path,default=Path(os.environ.get('MODELS_ROOT',str(ROOT/'models'))))

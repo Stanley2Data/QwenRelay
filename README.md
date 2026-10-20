@@ -107,6 +107,8 @@ bash scripts/install-qwenrelay.sh
 
 The installer creates a **new `.venv`**, installs dependencies, fetches the pinned vLLM source and reconstructs the QwenRelay source tree. It refuses an existing environment. Model download and server startup are separate steps.
 
+It checks the platform, Python, build tools and occupied output paths before installing packages. For a custom venv/build/model location, use the [custom-path example](docs/qwenrelay-install.md#custom-paths); keep those variables exported when downloading and launching.
+
 ### 3. Prepare the model
 
 ```bash
@@ -118,6 +120,8 @@ The installer creates a **new `.venv`**, installs dependencies, fetches the pinn
 ```
 
 Run the command for the profile you intend to use. TP1 assembles pinned public HyperQwen inputs and quantizes the embedding on CPU; each final file must match the asset lock. Existing model directories are verified rather than rewritten. See [model sources](#model-sources) for the exact repositories.
+
+`fetch-models`, `check-models` and `serve` all use exported `MODELS_ROOT` when no explicit model path is supplied. Downloads also occupy the Hugging Face cache (`HF_HOME` can relocate it), in addition to the final model directory; leave disk space on both filesystems.
 
 ### 4. Create a key and start
 
@@ -141,6 +145,8 @@ bash scripts/start-qwenrelay.sh --tp 4 --devices 0,1,2,3
 ```
 
 Real startup checks model hashes, runtime identities and visible GPUs before serving. Hashing large files and first-run compilation can take time. A successful `--dry-run` only confirms the launch plan.
+
+Keep that terminal running and wait for the API server to finish startup before sending requests. If it exits, inspect the first error in that terminal; `/v1/models` must succeed before testing generation.
 
 ### 5. Send a request
 
@@ -238,6 +244,8 @@ bash scripts/start-qwenrelay.sh --tp 1 --cpu-kv-gib 0 --dry-run
 
 Remove `--dry-run` to launch after inspecting the plan. New settings require capacity and performance checks. `5G` / `5GB` are rejected as ambiguous GPU-memory units. The native launcher uses arguments/exported variables; **it does not read `.env`**. Docker Compose reads `.env`.
 
+The public `--kv-cache-memory` option is translated to vLLM's full `--kv-cache-memory-bytes` flag.
+
 ### DFlash depth, QMAX and CUDA Graphs
 
 The launcher supplies all three performance settings automatically. At the default depth:
@@ -255,6 +263,8 @@ Logical query bound per request = K + 1
 CUDA Graph capture ceiling      = C × (K + 1)
 Default                         = 4 × (4 + 1) = 20 tokens
 ```
+
+Depth also changes the hybrid Mamba/attention cache page size. For nondefault depths, the launcher derives a 16-token-aligned block and rounds the prefix retention interval up to a whole block. At depth 6 these are **816 / 21,216 tokens**; at the default depth 4 they remain **800 / 20,800**. Both appear in `effective_settings`. This prevents O4 from rejecting a non-divisible retention interval; capacity and GPU correctness still require validation for the chosen depth.
 
 The scheduler token budget must cover this product. Graph20 covers the fixed four-request verification shape; it is **not** a KV-cache size or a promise to emit 20 tokens per step. Actual scratch tiles can round up beyond the logical query bound. Larger depth also does not change the draft model's trained block length.
 
@@ -305,20 +315,36 @@ To verify existing assets:
 
 ## Docker
 
-The repository includes a **local build recipe**, using the same launcher and profiles. Prepare model assets and `api_key.txt` first, then:
+The repository includes a **local build recipe**, using the same launcher and profiles. No host Python/vLLM installation is needed: use the built image to prepare weights and the key. Run from the repository directory:
 
 ```bash
+docker build -t qwenrelay:local .
+mkdir -p models
 cp .env.example .env
-# Edit .env: set MODEL_ASSET_DIR to an absolute host path.
+# Edit .env: set MODEL_ASSET_DIR to the absolute path of ./models.
 # TP1: TP=1 and CUDA_VISIBLE_DEVICES=0
 # TP2: TP=2 and CUDA_VISIBLE_DEVICES=0,1
 # TP4: TP=4 and CUDA_VISIBLE_DEVICES=0,1,2,3
-docker compose build
+
+# CPU-only preparation; match --tp to .env (2 and 4 share weights).
+docker run --rm --entrypoint /app/.venv/bin/python \
+  --mount "type=bind,src=$PWD/models,dst=/models" \
+  --mount type=volume,src=qwenrelay-download-cache,dst=/cache \
+  qwenrelay:local scripts/qwenrelay.py fetch-models --tp 1
+
+# Create once; preserve an existing key.
+umask 077
+if [ ! -e api_key.txt ]; then
+  docker run --rm --entrypoint /app/.venv/bin/python qwenrelay:local \
+    -c 'import secrets; print(secrets.token_urlsafe(32))' > api_key.txt
+fi
 docker compose up -d
 docker compose logs -f qwenrelay
 ```
 
 Compose mounts models read-only, mounts the API key as a secret, retains compilation caches in a volume and allocates 40 GiB shared memory. The host API port is bound to `127.0.0.1`. To override tuning parameters, edit the service's `command` list and recreate the container.
+
+The download container mounts models **read-write**; the serving container mounts them **read-only**. O4 allocates CPU cache in pinned host RAM, not a 32 GiB `/dev/shm` file. The shared-memory allowance supports container communication and is not additional physical RAM. Once `/v1/models` succeeds, use the same request examples as native installation.
 
 There is no prebuilt QwenRelay image. A fresh build and GPU startup of this recipe are still pending validation. [Docker details](docs/qwenrelay-install.md#docker-recipe).
 
@@ -326,13 +352,15 @@ There is no prebuilt QwenRelay image. A fresh build and GPU startup of this reci
 
 | Evidence | What it establishes |
 |---|---|
-| **Current merged source** | 22 CPU tests passed; complete reconstruction verified 3,208 source files, 54 inherited patches, 3 local base patches and 15 final overlays. This covers configuration, identities and allocation/dispatch behavior on CPU. |
+| **Current merged source** | 26 CPU tests passed; complete reconstruction verified 3,208 source files, 54 inherited patches, 3 local base patches and 15 final overlays. This covers configuration, identities and allocation/dispatch behavior on CPU. |
 | **Historical TP1** | 30-case same-GPU performance comparison with one warm and three formal rounds, using AutoRound-fast. |
 | **Historical TP2** | 32-case paired performance matrix, observed four-request Graph capture/replay and a separate 30-request repaired-cache acceptance. The performance matrix itself measured zero CPU→GPU restore bytes. |
 | **Historical TP4** | 23 numerical GPU cases, limited warmed serving checks, communication controls and a targeted greedy-output investigation. |
 | **Pending for the merged release** | Full model preparation from public inputs, fresh native/Docker deployment, TP1/TP2/TP4 numerical and serving regression, quality, cache restoration and longer stability runs. |
 
 See [validation boundaries](docs/qwenrelay-validation.md) and [machine-readable merge checks](docs/qwenrelay-tp-merge-validation.json). The [offline CI workflow](.github/workflows/qwenrelay-offline.yml) checks source reconstruction and CPU contracts; it does not run a GPU or publish an image.
+
+The [installation and launch audit](docs/qwenrelay-install-audit.md) records the latest entry-point fixes, dependency/asset checks and remaining deployment work.
 
 ## Common questions
 

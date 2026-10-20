@@ -146,6 +146,10 @@ The [machine-readable merge checks](qwenrelay-tp-merge-validation.json) record t
 source/configuration identities, 22 passing CPU tests, launch plans and public-asset
 provenance methods.
 
+The later [installation audit](qwenrelay-install-audit.md) adds entry-point
+regressions (26 tests total) and aligns hybrid cache blocks/retention when draft
+depth changes. Default profiles and the locked runtime overlay remain unchanged.
+
 Run the numerical checker only on selected idle GPUs in the installed environment:
 
 ```bash

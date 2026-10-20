@@ -107,6 +107,8 @@ bash scripts/install-qwenrelay.sh
 
 脚本创建**全新的 `.venv`**，安装依赖、获取固定版本 vLLM 并重建 QwenRelay 源码。已有环境会被拒绝。下载模型和启动服务是后续独立步骤。
 
+安装依赖前会先检查平台、Python、构建工具及输出路径占用。需要更换 venv、构建或模型目录时，使用[自定义目录示例](docs/qwenrelay-install.zh-CN.md#自定义目录)，下载和启动时保留这些 export 设置。
+
 ### 3. 准备权重
 
 ```bash
@@ -118,6 +120,8 @@ bash scripts/install-qwenrelay.sh
 ```
 
 执行你需要的配置所对应的命令。TP1 从固定版本的 HyperQwen 公开输入组装，在 CPU 上量化 embedding，再检查每个最终文件的哈希；已有模型目录只校验、不重写。具体来源见[模型权重](#模型权重)。
+
+不显式指定模型路径时，`fetch-models`、`check-models` 和 `serve` 都使用已 export 的 `MODELS_ROOT`。下载还会占用 Hugging Face 缓存（可用 `HF_HOME` 更换位置），最终模型目录另占空间，两个位置都要预留磁盘。
 
 ### 4. 创建密钥并启动
 
@@ -141,6 +145,8 @@ bash scripts/start-qwenrelay.sh --tp 4 --devices 0,1,2,3
 ```
 
 真实启动先校验模型哈希、运行库身份和可见 GPU。大文件哈希检查与首次编译可能需要一定时间。`--dry-run` 成功只表示启动计划生成成功。
+
+保持该终端运行，等 API 服务完成启动后再发请求。如果进程退出，先查看该终端里的第一条错误；`/v1/models` 成功后再测生成接口。
 
 ### 5. 发起第一条请求
 
@@ -238,6 +244,8 @@ bash scripts/start-qwenrelay.sh --tp 1 --cpu-kv-gib 0 --dry-run
 
 核对计划后移除 `--dry-run` 才会启动。修改配置后需要检查实际容量和性能。GPU 预算不接受含义不明确的 `5G` / `5GB`。原生启动器使用参数或已 export 的变量，**不会读取 `.env`**；Docker Compose 才会读取它。
 
+对外的 `--kv-cache-memory` 会转换成 vLLM 完整参数名 `--kv-cache-memory-bytes`。
+
 ### DFlash 深度、QMAX 与 CUDA Graph
 
 启动器自动注入全部三项性能开关。默认深度对应：
@@ -255,6 +263,8 @@ VLLM_DFLASH2_LOOKUP=1
 CUDA Graph 捕获上限  = C × (K + 1)
 默认                 = 4 × (4 + 1) = 20 tokens
 ```
+
+深度还会改变 Mamba/Attention 混合缓存页大小。非默认深度下，启动器计算按 16 tokens 对齐的块大小，并把前缀保留间隔向上取整到整块。深度 6 对应 **816 / 21,216 tokens**；默认深度 4 仍是 **800 / 20,800**。这两个值会显示在 `effective_settings`，避免 O4 因保留间隔不能整除块大小而拒绝启动；所选深度的容量和 GPU 正确性仍需验证。
 
 调度 token 预算必须覆盖这个乘积。Graph20 用来覆盖固定四路请求的验证形状，**不是** KV 缓存容量，也不保证每步输出 20 个 token。实际 scratch 可能按 kernel tile 向上取整；调大深度也不会改变草稿模型训练时的块长度。
 
@@ -305,20 +315,36 @@ O5 当前优化最多四条请求、2,048 个 query tokens 的合格 Prefill 批
 
 ## Docker 部署
 
-仓库提供使用同一启动器和配置的**本地构建方案**。先准备模型资产与 `api_key.txt`，再执行：
+仓库提供使用同一启动器和配置的**本地构建方案**。宿主机不必先安装 Python/vLLM，可以用构建好的镜像准备权重和 key。在仓库目录中执行：
 
 ```bash
+docker build -t qwenrelay:local .
+mkdir -p models
 cp .env.example .env
 # 编辑 .env，将 MODEL_ASSET_DIR 设为主机模型目录的绝对路径。
 # 单卡：TP=1，CUDA_VISIBLE_DEVICES=0
 # 双卡：TP=2，CUDA_VISIBLE_DEVICES=0,1
 # 四卡：TP=4，CUDA_VISIBLE_DEVICES=0,1,2,3
-docker compose build
+
+# 仅用 CPU 准备；--tp 与 .env 对应，2 和 4 共用权重。
+docker run --rm --entrypoint /app/.venv/bin/python \
+  --mount "type=bind,src=$PWD/models,dst=/models" \
+  --mount type=volume,src=qwenrelay-download-cache,dst=/cache \
+  qwenrelay:local scripts/qwenrelay.py fetch-models --tp 1
+
+# 只创建一次，保留已有 key。
+umask 077
+if [ ! -e api_key.txt ]; then
+  docker run --rm --entrypoint /app/.venv/bin/python qwenrelay:local \
+    -c 'import secrets; print(secrets.token_urlsafe(32))' > api_key.txt
+fi
 docker compose up -d
 docker compose logs -f qwenrelay
 ```
 
 Compose 将权重只读挂载、key 作为 secret 挂载，使用独立卷保留编译缓存，并配置 40 GiB 共享内存。主机 API 端口绑定到 `127.0.0.1`。需要覆盖调参项时，修改服务的 `command` 列表并重新创建容器。
+
+准备容器对模型目录使用**读写挂载**，服务容器使用**只读挂载**。O4 的 CPU 缓存分配在锁页主机内存中，不是一个 32 GiB 的 `/dev/shm` 文件；共享内存额度用于容器通信等需求，并非额外的物理内存。等待 `/v1/models` 成功后，沿用原生部署的请求示例即可。
 
 当前没有 QwenRelay 预构建镜像，这份构建方案的全新构建与 GPU 启动仍待验证。见 [Docker 详细说明](docs/qwenrelay-install.zh-CN.md#docker)。
 
@@ -326,13 +352,15 @@ Compose 将权重只读挂载、key 作为 secret 挂载，使用独立卷保留
 
 | 证据 | 已验证的范围 |
 |---|---|
-| **当前合并源码** | 22 项 CPU 测试通过；完整重建核对 3,208 份源码、54 项继承补丁、3 项本地基础补丁与 15 份最终覆盖文件。覆盖配置、身份和 CPU 上的分配/分派行为。 |
+| **当前合并源码** | 26 项 CPU 测试通过；完整重建核对 3,208 份源码、54 项继承补丁、3 项本地基础补丁与 15 份最终覆盖文件。覆盖配置、身份和 CPU 上的分配/分派行为。 |
 | **历史 TP1** | AutoRound-fast，同一 GPU 的 30 项性能对测，每项一轮预热、三轮正式测试。 |
 | **历史 TP2** | 32 项性能矩阵、四请求 Graph 捕获/回放观察，以及独立的 30 请求修复后缓存验收。性能矩阵自身的 CPU→GPU 恢复字节为零。 |
 | **历史 TP4** | 23 项数值 GPU 检查、有限预热服务测试、通信对照和定向贪心输出调查。 |
 | **合并版本待完成** | 从公开输入完整准备权重、全新原生/Docker 部署、TP1/TP2/TP4 数值与服务回归、质量、缓存恢复和更长时间稳定性测试。 |
 
 详见[验证边界](docs/qwenrelay-validation.md)和[机器可读合并检查](docs/qwenrelay-tp-merge-validation.json)。[离线 CI](.github/workflows/qwenrelay-offline.yml)运行源码重建与 CPU 检查，不执行 GPU 推理或发布镜像。
+
+本轮入口修复、依赖与模型来源检查，以及尚未执行的部署验证，记录在[安装与启动审计](docs/qwenrelay-install-audit.md)中。
 
 ## 常见问题
 

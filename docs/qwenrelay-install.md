@@ -20,6 +20,32 @@ The installer refuses an existing `.venv`, installs the direct dependency pins i
 
 Optional inputs: `PYTHON`, `QWENRELAY_VENV`, `QWENRELAY_BUILD`, and `VLLM_SOURCE` for an existing pristine checkout. The output build directory must be new. Transitive dependencies and OS package versions are resolved by pip/apt, so this is a pinned source/ABI recipe, not a hermetic dependency lock or byte-identical native build. Preserve `pip freeze` and native-file hashes when reproducing results.
 
+The installer checks Linux x86-64, Python 3.12, Git, GNU patch and C/C++ tools
+before installing packages. Existing venv/source/output paths fail early. After an
+interrupted install, choose new venv/build directories; it does not resume or
+delete a partially installed environment.
+
+### Custom paths
+
+Use this instead of the default install, in the same shell:
+
+```bash
+export QWENRELAY_VENV="$HOME/.local/share/qwenrelay/venv"
+export QWENRELAY_BUILD="$HOME/.cache/qwenrelay/build"
+export MODELS_ROOT="$HOME/models/qwenrelay"
+export HF_HOME="$HOME/.cache/qwenrelay/huggingface"
+bash scripts/install-qwenrelay.sh
+"$QWENRELAY_VENV/bin/python" scripts/qwenrelay.py fetch-models --tp 1
+bash scripts/start-qwenrelay.sh --tp 1 --dry-run
+```
+
+Create the API key as below before actual startup. Replace `.venv/bin/python` in
+later commands with `"$QWENRELAY_VENV/bin/python"`. The shell launcher chooses
+`QWENRELAY_PYTHON`, then `$QWENRELAY_VENV/bin/python`, then the repository's
+`.venv/bin/python`. Re-export custom variables in a new terminal; prefer absolute
+paths. `fetch-models` / `check-models --root` and `serve --models-root` override
+`MODELS_ROOT`; otherwise all three use it.
+
 ## Model assets
 
 ```bash
@@ -35,6 +61,11 @@ and [syvai DFlash2 W4A16](https://huggingface.co/syvai/Qwen3.8-27B-DFlash2-W4A16
 Existing primary directories are checked rather than modified. Downloaded Hugging Face
 cache files can be reused. The full large-file preparation has not been rerun in this
 packaging step; a mismatch fails instead of changing the lock.
+
+The Hub cache and final model files both use disk space; `HF_HOME` changes the
+cache location. CPU embedding preparation also uses temporary input/output files.
+On failure, inspect `.qwenrelay-tp1-*` staging directories before retrying;
+failed staging is preserved for diagnosis.
 
 TP2/TP4 use the original `locks/models.json`, with
 [EfficientThink SimPO](https://huggingface.co/nerkyor/Qwen3.8-27B-EfficientThink-Uncensored-K3-Opus5-Grok4.6-GPT5.6Sol-SFT-SimPO-DFlash2/tree/882e1af3b8f5844f3b3163b132e343c06e91908f/NVFP4/AWQ-W4A16)
@@ -94,6 +125,14 @@ product; incompatible combinations fail before key access, model loading or CUDA
 Scratch can round the logical QMAX up to a kernel tile. Graph coverage does not
 increase KV capacity or alter the draft model's trained block length. When depth
 exceeds that block, the existing lookup path attempts to fill extra verify positions.
+
+The cache page size also depends on depth. The launcher derives `--block-size` for
+nondefault depths and rounds the 20,800-token retention target up to an aligned
+`--prefix-cache-retention-interval`. Depth 6 uses 816 / 21,216 tokens; default
+depth 4 preserves 800 / 20,800. Check `hybrid_block_tokens` and
+`prefix_cache_retention_interval` in `effective_settings`. This geometry is for
+the locked Qwen models, INT8 PAD16 KV and FP16 recurrent state only.
+The public GPU budget flag maps to vLLM's `--kv-cache-memory-bytes`.
 
 ```bash
 # TP1 overrides: logical QMAX=7, Graph=14.
@@ -166,18 +205,38 @@ bash scripts/start-qwenrelay.sh --devices 0 --dry-run
 Check all three entries in `environment`, and check that the `argv` speculative configuration contains `method: dflash`, the selected `num_speculative_tokens` (default 4), `draft_sample_method: probabilistic` and the intended DFlash2 model path. With overrides also check the QMAX/Graph values in `effective_settings`. For TP4, use `--profile quad-3090 --devices 0,1,2,3`. A dry run confirms the plan only; after starting the real service, also inspect its process environment, startup configuration and nonzero `spec_decode` counters in `/metrics` after generation requests. Draft counters show speculative decoding activity, not proof that every request shape used the split-KV path.
 
 ## Docker recipe
-
-The root Dockerfile builds the same source/venv recipe; there is no prebuilt QwenRelay image or registry dependency. Prepare models and `api_key.txt` first. Copy `.env.example` to `.env`, set `MODEL_ASSET_DIR` to an absolute host model directory, then:
+The repository includes a **local build recipe**, using the same launcher and profiles. No host Python/vLLM installation is needed: use the built image to prepare weights and the key. Run from the repository directory:
 
 ```bash
-docker compose build
+docker build -t qwenrelay:local .
+mkdir -p models
+cp .env.example .env
+# Edit .env: set MODEL_ASSET_DIR to the absolute path of ./models.
+# TP1: TP=1 and CUDA_VISIBLE_DEVICES=0
+# TP2: TP=2 and CUDA_VISIBLE_DEVICES=0,1
+# TP4: TP=4 and CUDA_VISIBLE_DEVICES=0,1,2,3
+
+# CPU-only preparation; match --tp to .env (2 and 4 share weights).
+docker run --rm --entrypoint /app/.venv/bin/python \
+  --mount "type=bind,src=$PWD/models,dst=/models" \
+  --mount type=volume,src=qwenrelay-download-cache,dst=/cache \
+  qwenrelay:local scripts/qwenrelay.py fetch-models --tp 1
+
+# Create once; preserve an existing key.
+umask 077
+if [ ! -e api_key.txt ]; then
+  docker run --rm --entrypoint /app/.venv/bin/python qwenrelay:local \
+    -c 'import secrets; print(secrets.token_urlsafe(32))' > api_key.txt
+fi
 docker compose up -d
 docker compose logs -f qwenrelay
 ```
 
-The Compose configuration exposes all NVIDIA devices to the container and uses `TP=1` and `CUDA_VISIBLE_DEVICES=0` by default. Set both `TP=2` / `CUDA_VISIBLE_DEVICES=0,1`, or `TP=4` / `CUDA_VISIBLE_DEVICES=0,1,2,3` in `.env` for the other profiles. HTTP is published to host loopback only. The model bind mount is read-only, the key is a mounted secret and the compile cache is a named volume. Shared memory is 40 GiB for the host-cache path. No privileged mode, host Docker socket, controller, or automatic restart is required. Stop this deployment with `docker compose down` when you choose to.
+Compose mounts models read-only, mounts the API key as a secret, retains compilation caches in a volume and allocates 40 GiB shared memory. The host API port is bound to `127.0.0.1`. To override tuning parameters, edit the service's `command` list and recreate the container.
 
-**This recipe was not built or GPU-started during repository packaging.** The installed TP2 runtime was validated previously; fresh-container success remains a separate validation step. See [the exact boundary](qwenrelay-validation.md).
+The download container mounts models **read-write**; the serving container mounts them **read-only**. O4 allocates CPU cache in pinned host RAM, not a 32 GiB `/dev/shm` file. The shared-memory allowance supports container communication and is not additional physical RAM. Once `/v1/models` succeeds, use the same request examples as native installation.
+
+There is no prebuilt QwenRelay image. A fresh build and GPU startup of this recipe are still pending validation. [validation boundaries](qwenrelay-validation.md).
 
 ## Offline reconstruction and checks
 

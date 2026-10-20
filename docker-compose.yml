@@ -1,5 +1,6 @@
 services:
   qwenrelay:
+    image: qwenrelay:local
     build: .
     shm_size: '40gb'
     command: ['--tp', '${TP:-1}']

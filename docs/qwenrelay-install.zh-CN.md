@@ -20,6 +20,29 @@ bash scripts/install-qwenrelay.sh
 
 可选环境变量为 `PYTHON`、`QWENRELAY_VENV`、`QWENRELAY_BUILD`、`VLLM_SOURCE`。最后一项可指定已经准备好的干净 vLLM 源码，构建输出目录必须是新的。直接依赖和源码有固定版本，传递依赖及 apt 包仍按当时解析；它不是完全封闭的依赖锁或逐字节相同的 native 构建。复现时保存 `pip freeze` 和原生文件 SHA。
 
+安装依赖前先检查 Linux x86-64、Python 3.12、Git、GNU patch、C/C++ 工具及路径占用。
+安装中断后选择新的 venv/build 目录；脚本不接续或删除半成品环境。
+
+### 自定义目录
+
+如果需要更换默认位置，用下面的流程代替默认安装，在同一终端中执行：
+
+```bash
+export QWENRELAY_VENV="$HOME/.local/share/qwenrelay/venv"
+export QWENRELAY_BUILD="$HOME/.cache/qwenrelay/build"
+export MODELS_ROOT="$HOME/models/qwenrelay"
+export HF_HOME="$HOME/.cache/qwenrelay/huggingface"
+bash scripts/install-qwenrelay.sh
+"$QWENRELAY_VENV/bin/python" scripts/qwenrelay.py fetch-models --tp 1
+bash scripts/start-qwenrelay.sh --tp 1 --dry-run
+```
+
+实际启动前按下文创建 API key。后续命令中的 `.venv/bin/python` 相应替换为
+`"$QWENRELAY_VENV/bin/python"`。启动器依次选择显式 `QWENRELAY_PYTHON`、
+`$QWENRELAY_VENV/bin/python`、仓库 `.venv/bin/python`。新终端中需重新 export，
+建议使用绝对路径。`fetch-models` / `check-models --root` 和 `serve --models-root`
+优先于 `MODELS_ROOT`；省略路径时三者共用该变量。
+
 ## 准备权重
 
 ```bash
@@ -33,6 +56,9 @@ bash scripts/install-qwenrelay.sh
 [syvai DFlash2 W4A16](https://huggingface.co/syvai/Qwen3.8-27B-DFlash2-W4A16/tree/4d30ec736ffc6b8688dc2ae2b502d9b48bdec279)。
 已有 AutoRound-fast 目录只检查、不原地修改；可复用 Hugging Face 下载缓存。
 本轮打包尚未重新执行完整大文件准备，哈希不匹配会停止，不会放宽锁定条件。
+
+Hub 缓存与最终模型分别占用磁盘；`HF_HOME` 可以指定缓存位置。CPU embedding 准备还需要
+临时输入输出空间。失败的 `.qwenrelay-tp1-*` 暂存目录会保留供排查，重试前检查剩余空间。
 
 双卡、四卡使用原来的 `locks/models.json` 和
 [EfficientThink SimPO](https://huggingface.co/nerkyor/Qwen3.8-27B-EfficientThink-Uncensored-K3-Opus5-Grok4.6-GPT5.6Sol-SFT-SimPO-DFlash2/tree/882e1af3b8f5844f3b3163b132e343c06e91908f/NVFP4/AWQ-W4A16)，
@@ -92,6 +118,13 @@ max_cudagraph_capture_size = C × (K + 1)
 访问 CUDA 前报错，提示增大批处理预算或减小并发/深度。QMAX 是逻辑请求长度，实际 scratch
 还可能按 kernel tile 向上取整；Graph 上限不改变模型的训练草稿长度，也不增加 KV 缓存。
 若推测深度超过草稿模型训练块，额外验证位置由现有 lookup 路径尝试补齐。
+
+缓存页大小也随深度改变。非默认深度下启动器推导 `--block-size`，并把 20,800-token
+保留间隔目标向上取整为整块的 `--prefix-cache-retention-interval`。深度 6 对应
+816 / 21,216 tokens，默认深度 4 保持 800 / 20,800。可在 `effective_settings` 的
+`hybrid_block_tokens` 和 `prefix_cache_retention_interval` 核对。这套推导仅针对锁定的
+Qwen 主模型、INT8 PAD16 KV 与 FP16 循环状态。对外 GPU 预算参数转换为 vLLM 完整名称
+`--kv-cache-memory-bytes`。
 
 ```bash
 # TP1 默认值之上手动覆盖；此例逻辑 QMAX=7、Graph=14。
@@ -161,18 +194,38 @@ bash scripts/start-qwenrelay.sh --devices 0 --dry-run
 核对输出 `environment` 中的三项值，以及 `argv` 中推测配置的 `method: dflash`、所选 `num_speculative_tokens`（默认 4）、`draft_sample_method: probabilistic` 和正确的 DFlash2 模型路径。手动覆盖时也核对 `effective_settings` 中 QMAX 与 Graph 上限。四卡使用 `--profile quad-3090 --devices 0,1,2,3`。dry-run 仅确认计划；真实启动后，还应核对进程环境、启动配置，并在生成请求后查看 `/metrics` 中非零的 `spec_decode` 计数。草稿计数证明推测解码有实际活动，不能单独证明所有请求形状都走了 split-KV 路径。
 
 ## Docker
-
-根目录 Dockerfile 构建同一安装路径，没有借用上游预构建镜像。先准备权重和 `api_key.txt`，复制 `.env.example` 为 `.env`，把 `MODEL_ASSET_DIR` 改为主机上模型父目录的绝对路径：
+仓库提供使用同一启动器和配置的**本地构建方案**。宿主机不必先安装 Python/vLLM，可以用构建好的镜像准备权重和 key。在仓库目录中执行：
 
 ```bash
-docker compose build
+docker build -t qwenrelay:local .
+mkdir -p models
+cp .env.example .env
+# 编辑 .env，将 MODEL_ASSET_DIR 设为主机模型目录的绝对路径。
+# 单卡：TP=1，CUDA_VISIBLE_DEVICES=0
+# 双卡：TP=2，CUDA_VISIBLE_DEVICES=0,1
+# 四卡：TP=4，CUDA_VISIBLE_DEVICES=0,1,2,3
+
+# 仅用 CPU 准备；--tp 与 .env 对应，2 和 4 共用权重。
+docker run --rm --entrypoint /app/.venv/bin/python \
+  --mount "type=bind,src=$PWD/models,dst=/models" \
+  --mount type=volume,src=qwenrelay-download-cache,dst=/cache \
+  qwenrelay:local scripts/qwenrelay.py fetch-models --tp 1
+
+# 只创建一次，保留已有 key。
+umask 077
+if [ ! -e api_key.txt ]; then
+  docker run --rm --entrypoint /app/.venv/bin/python qwenrelay:local \
+    -c 'import secrets; print(secrets.token_urlsafe(32))' > api_key.txt
+fi
 docker compose up -d
 docker compose logs -f qwenrelay
 ```
 
-容器暴露 NVIDIA 设备，默认 `TP=1`、`CUDA_VISIBLE_DEVICES=0`。在 `.env` 中同时设 `TP=2` / `CUDA_VISIBLE_DEVICES=0,1`，或 `TP=4` / `CUDA_VISIBLE_DEVICES=0,1,2,3` 可选择双卡、四卡，主机端口仅发布到 loopback。权重只读挂载、key 作为 secret、编译缓存使用独立卷，`/dev/shm` 为 40 GiB。不需要 privileged 或宿主 Docker socket，也没有自动重启策略。
+Compose 将权重只读挂载、key 作为 secret 挂载，使用独立卷保留编译缓存，并配置 40 GiB 共享内存。主机 API 端口绑定到 `127.0.0.1`。需要覆盖调参项时，修改服务的 `command` 列表并重新创建容器。
 
-**本轮整理没有执行全新 Docker 构建或 GPU 启动。** 以前双卡运行库验证和本次公开安装路径检查分开记录，详见[验证边界](qwenrelay-validation.md)。
+准备容器对模型目录使用**读写挂载**，服务容器使用**只读挂载**。O4 的 CPU 缓存分配在锁页主机内存中，不是一个 32 GiB 的 `/dev/shm` 文件；共享内存额度用于容器通信等需求，并非额外的物理内存。等待 `/v1/models` 成功后，沿用原生部署的请求示例即可。
+
+当前没有 QwenRelay 预构建镜像，这份构建方案的全新构建与 GPU 启动仍待验证。见 [验证边界](qwenrelay-validation.md)。
 
 ## 离线重建
 
