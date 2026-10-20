@@ -8,4 +8,4 @@ Run `python3 scripts/qwenrelay.py check-pack`, `python3 -m unittest discover -s 
 
 Submit source and small reproducible tests only. Keep model weights, venvs, build outputs, API keys, local paths, private logs and compilation caches out of commits. Benchmark comparisons must specify hardware, model SHA, effective profile, real input/output tokens, warmup/repeats and metric definition. Do not report `C / mean TPOT` as aggregate throughput.
 
-There is no automated release/push pipeline in this initial source candidate. Public hosting and maintainer contact details will be established when the repository is published.
+The [offline CI workflow](.github/workflows/qwenrelay-offline.yml) checks source reconstruction and CPU contracts on pushes and pull requests. It does not run GPU inference or publish release images. Use [GitHub issues](https://github.com/Stanley2Data/QwenRelay/issues) for reproducible bugs and field reports, and pull requests for reviewed source/documentation changes.

@@ -22,6 +22,12 @@ performance for user-selected overrides.
 
 ## Recorded runtime evidence
 
+The historical TP1 AutoRound-fast implementation completed a same-GPU 30-case
+comparison with one warm and three formal rounds per arm. The [public TP1 summary](qwenrelay-tp1-benchmarks.md)
+retains all medians/ranges and the test's performance-only scope. It predates the
+unified source merge. Historical TP4 numerical, serving and communication evidence
+is recorded separately in the [TP4 validation note](qwenrelay-tp4-validation.md).
+
 The final F candidate's four-request main/draft FULL20 CUDA Graph capture and actual replay were observed on both TP ranks. The H/F comparison completed the original22 and additional10 context/decode cases with one complete warm round and three formal rounds per arm. A separate repaired-F cache-restoration acceptance completed the original30 requests. See [benchmark details and limits](qwenrelay-benchmarks.md).
 
 The original ported source tree was locked to3,208 files. That source candidate was not the earlier F that lacked Graph20 coverage or the earlier F that restored zero CPU-cache tokens. These recorded runtime results exclude the later single-card profile and the current merged sources.
@@ -38,6 +44,6 @@ Shell syntax/LF, public Python/JSON syntax, profile equality with the recorded l
 
 - A full fresh Docker build, clean-machine dependency resolution/native import and model startup through the new public installer/launcher.
 - New GPU numerical, quality, speed or cache-recovery runs after packaging. Existing evidence is retained at its original scope.
-- Single-GPU serving, other GPU models/drivers, other checkpoints, vision, maximum simultaneous256K contexts, high-concurrency deployment and long-running stability.
+- Serving through the current merged TP1/TP2/TP4 package; other GPU models/drivers, other checkpoints, vision, maximum simultaneous256K contexts, high-concurrency deployment and long-running stability. Historical TP1/TP4 runs above remain evidence for their original implementations.
 
 The Docker image/base and direct dependency versions are pinned, but transitive pip and OS packages are not fully hermetic. Do not call the recipe a byte-identical runtime build. A successful offline reconstruction does not certify GPU behavior or deployment readiness. No upstream container image is presented as a QwenRelay image; there is no automatic publishing workflow.

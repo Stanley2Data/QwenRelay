@@ -127,7 +127,7 @@ adopted from unrelated upstream profiles.
 
 ## Evidence and remaining validation
 
-The historical single-GPU F completed a 30-case same-GPU H/F performance comparison,
+The historical single-GPU F completed a [30-case same-GPU H/F performance comparison](qwenrelay-tp1-benchmarks.md),
 with one warm and three formal rounds per case. Its weights and resource limits
 differ from the original TP2 EfficientThink comparison. Its results do not establish
 that fewer cards are intrinsically faster, or that the public merged tree has passed
